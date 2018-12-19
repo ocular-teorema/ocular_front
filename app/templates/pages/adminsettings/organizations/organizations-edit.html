@@ -1,0 +1,20 @@
+<section class="main admin-container profile" ng-class="{'in-loading': sendForm}">
+  <div class="container clearfix">
+    <h1>{{ (state.current.data.isNewServer) ? 'Добавление' : 'Редактирование'}} организации</h1>
+    <div class="profile__block">
+      <div class="profile__block profile__block--wide">
+        <form name="organizationForm" ng-submit="saveOrganization(organizationForm)" class="profile__block__form">
+          <div class="form-field form-field--required">
+            <label>
+              Название
+              <br>
+              <input ng-model="organizationModel.name" class="form-field__input" required type="text">
+            </label>
+          </div>
+          <button type="submit" class="button">Сохранить</button>
+        </form>
+        <button ng-if="organizationModel.id" ng-click="deleteOrganization()" class="button button--dell">Удалить пользователя</button>
+      </div>
+    </div>
+  </div>
+</section>

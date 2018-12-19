@@ -1,0 +1,88 @@
+.windows- {
+  &mask {
+    position: fixed;
+    background-color: rgba(0, 0, 0, 0.6);
+    left: 0;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    z-index: 50;
+  }
+  &notice {
+    font-size: 14px;
+    width: 600px;
+    max-width: 96%;
+    background: #fff;
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    z-index: 60;
+    border: 1px solid #2b91ed;
+    border-radius: 10px;
+    transform: scale(0.8);
+    transition: transform 0.2s cubic-bezier(0, 2.08, 1, 1);
+    &.on-visible {
+      transform: scale(1);
+    }
+  }
+  &title {
+    font-weight: bold;
+    font-size: 1.5em;
+    margin: 0.25em 0 1em;
+  }
+  &text {
+    text-align: left;
+    input {
+      position: relative;
+      outline: none;
+      font-weight: 400;
+      font-family: MyLittleFont;
+      width: 220px;
+      border: 1px solid #091926;
+      border-radius: 5px;
+      box-shadow: inset 0 -1px 1px hsla(0,0%,100%,.25);
+      background: #3e4a56;
+      font-size: 18px;
+      color: #0ed6be;
+      padding: 10px 5px;
+      margin: 10px auto 0;
+    }
+  }
+  &content {
+    padding: 1em 1.5em 2.5em;
+    color: #000;
+  }
+  &buttons {
+    text-align: left;
+    padding: 1em 1.5em;
+    background-color: #fff;
+    border-top: 2px solid #2b91ed;
+    border-radius: 0 0 10px 10px;
+
+    button {
+      user-select: none;
+      cursor: pointer;
+      outline: 0;
+      font-weight: 700;
+      width: 180px;
+      border: 2px solid #2b91ed;
+      border-radius: 5px;
+      background: #fff;
+      font-size: 15px;
+      color: #2b91ed;
+      padding: 10px 5px;
+      + button {
+        margin-left: 10px;
+      }
+      &.btn-red {
+        color: #ef4c56;
+        border: 2px solid #ef4c56;
+      }
+    }
+  }
+  &body {
+    .left-sidebar, .all-page-handler, .top-bar {
+      filter: blur(3px);
+    }
+  }
+};

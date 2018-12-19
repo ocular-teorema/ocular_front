@@ -1,0 +1,61 @@
+.statistics-container.reporting-container {
+  .container {
+    width: 664px;
+  }
+  .slider-main-tools {
+    float: left;
+    padding-bottom: 100px;
+  }
+  .slider-main {
+    height: auto;
+    margin-left: 244px;
+    padding: 20px;
+    width: auto;
+    float: none;
+    color: #fff;
+  }
+  &:after {
+    display: table;
+    width: 100%;
+  }
+}
+.reporting-text-field {
+  position: relative;
+  outline: 0;
+  font-weight: 400;
+  border: 1px solid #091926;
+  border-radius: 5px;
+  box-shadow: inset 0 -1px 1px rgba(255,255,255,0.25);
+  background: #3e4a56;
+  font-size: 18px;
+  color: #0ed6be;
+  padding: 10px 5px;
+  width: 100%;
+  box-sizing: border-box;
+
+  &::-webkit-input-placeholder {color:#999;}
+  &::-moz-placeholder          {color:#999;}/* Firefox 19+ */
+  &:-moz-placeholder           {color:#999;}/* Firefox 18- */
+  &:-ms-input-placeholder      {color:#999;}
+
+  &:focus {
+    &::-webkit-input-placeholder {color:transparent;}
+    &::-moz-placeholder          {color:transparent;}/* Firefox 19+ */
+    &:-moz-placeholder           {color:transparent;}/* Firefox 18- */
+    &:-ms-input-placeholder      {color:transparent;}
+  }
+
+  .ng-submitted &, &.ng-touched {
+    &.ng-invalid {
+      border-color: #800;
+    }
+  }
+  &[disabled] {
+    color: #098373;
+  }
+}
+.reporting-fields-group {
+  + .reporting-fields-group {
+    margin-top: 30px;
+  }
+}

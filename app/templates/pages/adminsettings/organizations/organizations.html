@@ -1,0 +1,25 @@
+<section class="main users admin-container profile">
+  <div class="container clearfix">
+    <h1>Список организаций</h1>
+    <a ui-sref="main.adminsettings.organizations.create()" class="button button--grad">Добавить</a>
+    <table ng-init="sortUsers('username')" class="list">
+      <thead>
+        <tr>
+          <td ng-repeat="title in tableTitles"
+              ng-click="sortCameras(title.key)"
+              ng-class="{sorted: title.key === sortField}">
+              <span>{{title.name}}</span></td>
+          <td></td>
+          <td></td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr ng-repeat="organization in organizationsList">
+          <td>{{ organization.name }}</td>
+          <td class="list__btn"><a href="" ui-sref="main.adminsettings.organizations.edit({organizationId: organization.id})"><img src="/static/images/buttons/set.svg" alt=""></a></td>
+          <td class="list__btn"><a href="" ng-click="deleteOrganization(organization)"><img src="/static/images/buttons/del.svg" alt=""></a></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>

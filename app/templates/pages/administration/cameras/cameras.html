@@ -1,0 +1,30 @@
+<section class="main users admin-container profile">
+    <div class="container clearfix">
+      <h1>Список камер</h1>
+      <a ui-sref="main.administration.cameras.create({organizationId: organizationId})" class="button button--grad">Добавить</a>
+      <table ng-init="sortUsers('username')" class="list">
+        <thead>
+          <tr>
+            <td ng-repeat="title in tableTitles"
+                ng-click="sortCameras(title.key)"
+                ng-class="{sorted: title.key === sortField}">
+                <span>{{title.name}}</span></td>
+            <td></td>
+            <td></td>
+          </tr>
+        </thead>
+        <tbody>
+          <tr ng-repeat="camera in cameras">
+            <td>{{ camera.camera_group.name }}</td>
+            <td>{{ camera.name }}</td>
+            <td>{{ (camera.indefinitely) ? 'Бессрочно' : camera.storage_life }}</td>
+            <td>{{ analiseTypesList[camera.analysis] }}</td>
+            <!-- <td>{{ 1200 }}</td>
+            <td>{{ '28.06.2018' }}</td> -->
+            <td><a ui-sref="main.administration.cameras.edit({organizationId: camera.organization, cameraId: camera.id})"><img src="/static/images/buttons/set.svg" alt=""></a></td>
+            <td><a href="" ng-click="deleteCamera(camera)"><img src="/static/images/buttons/del.svg" alt=""></a></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>

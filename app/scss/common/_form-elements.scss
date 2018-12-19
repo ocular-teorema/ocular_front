@@ -1,0 +1,97 @@
+.toolbox-check-box {
+  margin-bottom: 12.5px;
+  margin-top: 10px;
+}
+input[type=checkbox] {
+  display: none;
+  +label {
+    font-size: 14px;
+    font-weight: normal;
+    padding-left: 30px;
+    position: relative;
+    cursor: pointer;
+    display: block;
+    vertical-align: top;
+    line-height: inherit;
+    margin: 0;
+    &:before {
+      width: 20px;
+      height: 20px;
+      border-radius: 2px;
+      position: absolute;
+      left: 0;
+      top: 0;
+      content: '';
+      z-index: 1;
+      background: #f5f5f5;
+      background: -webkit-gradient(linear,left top,left bottom,color-stop(0,#f5f5f5),color-stop(100%,#eee));
+      background: -webkit-linear-gradient(top,#f5f5f5,#eee);
+      background: linear-gradient(180deg,#f5f5f5 0,#eee);
+    }
+    &:after {
+      width: 20px;
+      height: 20px;
+      position: absolute;
+      left: 0;
+      top: 0;
+      content: '';
+      z-index: 2;
+      background: url(images/checkbox.png) no-repeat center -100px;
+    }
+  }
+  &:checked+label:after {
+    background-position: 50%;
+  }
+}
+.text-field {
+  border-radius: 5px;
+  padding: 10px;
+  border: 2px solid #e1e1e1;
+  max-width: 493px;
+  font-size: 1.2em;
+  &--group {
+    padding-left: 40px;
+    background: url('../images/group_camera.svg') no-repeat 5px;
+  }
+  &--camera {
+    padding-left: 40px;
+    background: url('../images/camera.svg') no-repeat 5px;
+  }
+}
+.datepicker {
+  float: left;
+  position: relative;
+  .text-field {
+    cursor: pointer;
+  }
+  input {
+    width: 102% !important;
+  }
+  &:after {
+    right: -6px;
+    top: 50%;
+    content: '';
+    height: 0;
+    width: 0;
+    position: absolute;
+    pointer-events: none;
+    border: 8px solid hsla(0, 0%, 78%, 0);
+    border-top-color: #c6c6c6;
+    margin-top: -4px;
+  }
+}
+.form-fields-group {
+  &:after {
+    content: '';
+    display: block;
+    clear: both;
+  }
+  .form-field {
+    width: 50%;
+    float: left;
+    input {
+      width: 96%;
+      box-sizing: border-box;
+    }
+  }
+}

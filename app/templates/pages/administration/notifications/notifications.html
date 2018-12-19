@@ -1,0 +1,28 @@
+<section class="main users admin-container profile">
+    <div class="container clearfix">
+      <h1>Правила уведомлений</h1>
+      <a ui-sref="main.administration.notifications.create({organizationId: organizationId})" class="button button--grad">Добавить</a>
+      <table ng-init="sortUsers('username')" class="list list--nosort">
+        <thead>
+          <tr>
+            <td ng-repeat="title in tableTitles"
+                ng-click="sortUsers(title.key)"
+                ng-class="{sorted: title.key === sortField}">
+                <span>{{title.name}}</span></td>
+            <td></td>
+            <td></td>
+          </tr>
+        </thead>
+        <tbody>
+          <tr ng-repeat="notification in notificationsList">
+            <td>{{ notification.camera_group | cameraById: cameraGroupsList }}</td>
+            <td>{{ notification.cameras | cameraById: camerasList }}</td>
+            <td>{{ notification.notify_events | typeByCode }}</td>
+            <td>{{ notification.users | nameById: usersList }}</td>
+            <td><a ui-sref="main.administration.notifications.edit({notificationId: notification.id})"><img src="/static/images/buttons/set.svg" alt=""></a></td>
+            <td><a href="" ng-click="deleteNotification(notification)"><img src="/static/images/buttons/del.svg" alt=""></a></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>

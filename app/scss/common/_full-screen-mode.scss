@@ -1,0 +1,342 @@
+
+body {
+  header .view-box {
+    display: none;
+  }
+  header {
+    .cameras-select-container {
+      display: none;
+      margin-right: 10px;
+      .select {
+        .select-active-area {
+          padding-top: 9px;
+          padding-bottom: 10px;
+        }
+        &.cameras-select {
+          .select-active-area {
+            margin-right: 60px;
+          }
+        }
+      }
+    }
+  }
+  .camera-fullscreen-event {
+    display: none;
+    position: absolute;
+    bottom: 0;
+    color: #fff;
+    background-color: rgba(0, 0, 0, 0.6);
+    left: 0;
+    right: 0;
+    padding: 10px;
+    z-index: 4;
+    line-height: 34px;
+  }
+  .camera-fullscreen-event-description {
+    font-weight: bold;
+    display: inline-block;
+    white-space: nowrap;
+    line-height: 15px;
+    margin-right: 15px;
+  }
+  .camera-fullscreen-event-buttons {
+    white-space: nowrap;
+    margin-top: 10px;
+    display: inline-block;
+    button {
+      vertical-align: middle;
+      border: 0 none;
+      cursor: pointer;
+      height: 34px;
+      line-height: 34px;
+      text-decoration: none;
+      text-align: center;
+      color: #fff;
+      font-weight: 700;
+      font-size: 14px;
+      border-radius: 3px;
+      padding: 0 10px;
+      margin-right: 5px;
+      &.camera-fullscreen-false-button {
+        box-shadow: 0 3px 5px rgba(0,0,0,0.7), inset 0 1px 1px #878d94;
+        background: #77838e;
+        background: -webkit-gradient(linear,left top,left bottom,color-stop(0,#77838e),color-stop(100%,#2b353d));
+        background: -webkit-linear-gradient(top,#77838e,#2b353d);
+        background: linear-gradient(180deg,#77838e 0,#2b353d);
+        text-shadow: 0 -1px 0 #32383f;
+      }
+      &.camera-fullscreen-alarm-button {
+        box-shadow: 0 3px 5px rgba(0,0,0,0.7), inset 0 1px 1px #d43e21;
+        background: #f47757;
+        background: -webkit-gradient(linear,left top,left bottom,color-stop(0,#f47757),color-stop(100%,#da1b15));
+        background: -webkit-linear-gradient(top,#f47757,#da1b15);
+        background: linear-gradient(180deg,#f47757 0,#da1b15);
+        text-shadow: 0 -1px 0 #32383f;
+      }
+    }
+  }
+}
+
+
+@media all and (display-mode: fullscreen) {
+  body {
+    width: 100%;
+    height: 100%;
+    background-color: #000;
+    .camera-fullscreen-event {
+      display: block;
+    }
+    .user-main-holder {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+    .cameras-table {
+      top: 0;
+    }
+    .stream-panel {
+      position: relative;
+      z-index: 5;
+      opacity: 0;
+      &:hover {
+        opacity: 1;
+      }
+    }
+    header {
+      display: none;
+      //position: fixed;
+      //top: 0;
+      //left: 0;
+      //right: 0;
+      z-index: 9;
+      background-color: #fff;
+      height: auto;
+      padding: 5px 0;
+      .container {
+        width: auto;
+        &:after {
+          clear: both;
+          content: '';
+          display: table;
+          width: 100%;
+        }
+      }
+      .logo {
+        position: static;
+        display: block;
+        height: 40px;
+        float: left;
+      }
+      nav {
+        display: none;
+      }
+      .user {
+        padding-top: 0;
+        position: static;
+        float: right;
+      }
+      .view-box {
+        border: 1px solid #091926;
+        border-radius: 3px;
+        box-shadow: 0 2px 3px rgba(0,0,0,.41),inset 0 1px 1px hsla(0,0%,100%,.25);
+        background: #333d46;
+        background: -webkit-gradient(linear,left top,left bottom,color-stop(0,#333d46),color-stop(100%,#232a31));
+        background: -webkit-linear-gradient(top,#333d46,#232a31);
+        background: linear-gradient(180deg,#333d46 0,#232a31);
+        text-align: center;
+        padding: 5px;
+        margin-right: 30px;
+        display: block;
+        + .view-box {
+          margin-right: 10px;
+        }
+      }
+      .view-box ul {
+        vertical-align: top;
+        margin: 0 auto;
+        padding: 0;
+        list-style-type: none;
+        li {
+          display: inline-block;
+          margin: 0;
+          vertical-align: middle;
+          + li {
+            margin-left: 2px;
+          }
+        }
+        a {
+          cursor: pointer;
+          width: 26px;
+          height: 26px;
+          display: block;
+          //box-shadow: 0 1px 2px rgba(0,0,0,.31);
+          background-repeat: no-repeat;
+          background-position: left top;
+          img {
+            display: block;
+            width: 100%;
+            height: 100%;
+          }
+          &.onestream {
+            background-image: url(images/stream/1x1.png);
+            &.active {
+              background-image: url(images/stream/1x1_active.png);
+            }
+          }
+          &.fourstreams {
+            background-image: url(images/stream/four-stream.png);
+            &.active {
+              background-image: url(images/stream/four-stream-active.png);
+            }
+          }
+          &.ninestreams {
+            background-image: url(images/stream/3x3.png);
+            &.active {
+              background-image: url(images/stream/3x3_active.png);
+            }
+          }
+          &.twentystreams {
+            background-image: url(images/stream/3x4.png);
+            &.active {
+              background-image: url(images/stream/3x4_active.png);
+            }
+          }
+          &.twostreams {
+            background-image: url(images/stream/1x2.png);
+            &.active {
+              background-image: url(images/stream/1x2_active.png);
+            }
+          }
+          &.manystreams {
+            background-image: url(images/stream/many-stream.png);
+            &.active {
+              background-image: url(images/stream/many-stream-active.png);
+            }
+          }
+          &.supermode {
+            background-image: url(images/stream/super-mode.png);
+            &.active {
+              background-image: url(images/stream/super-mode-active.png);
+            }
+          }
+          &.fivestreams {
+            background-image: url(images/stream/5x5.png);
+            &.active {
+              background-image: url(images/stream/5x5-active.png);
+            }
+          }
+        }
+      }
+      .cameras-select-container {
+        display: block;
+        margin-right: 20px;
+      }
+    }
+    .base-content-wrapper {
+      //position: fixed;
+      margin-top: 0;
+      padding-top: 0;
+      //left: 0;
+      //right: 0;
+      //bottom: 0;
+      z-index: 8;
+      .main {
+        padding: 0;
+        height: 100%;
+      }
+      .container {
+        width: auto;
+        padding: 0;
+        margin: 0;
+        height: 100%;
+      }
+      .slider-main {
+        float: none;
+        width: auto;
+        margin: 0;
+        height: calc(100vh - 120px);
+        &.five-mode .camera-stream-container {
+          width: 20%;
+          margin: 0;
+          height: 20%;
+        }
+        &.nine-mode .camera-stream-container {
+          width: 33.3%;
+          margin: 0;
+          height: 33.3%;
+        }
+        &.twenty-mode .camera-stream-container {
+          width: 33.3%;
+          margin: 0;
+          height: 25%;
+        }
+        &.many-mode .camera-stream-container {
+          width: 25%;
+          margin: 0;
+          height: 25%;
+        }
+        &.super-mode .camera-stream-container {
+          width: 25%;
+          margin: 0;
+          height: 25%;
+          &:first-child {
+            width: 50%;
+            height: 50%;
+            .camera-preview-container {
+              height: 100%;
+              [id^=camera-preview-] {
+                width:100%;
+                height: 100%;
+              }
+            }
+          }
+        }
+        &.four-mode .camera-stream-container {
+          width: 50%;
+          margin: 0;
+          height: 50%;
+        }
+        &.two-mode .camera-stream-container {
+          width: 50%;
+          float: left;
+          margin: 0;
+        }
+        &.single-mode .camera-stream-container {
+          width: 100%;
+          height: calc(100vh - 120px);
+        }
+        .camera-stream-container {
+          &:hover {
+            .cameras-categories-block {
+              display: block;
+            }
+          }
+        }
+        .camera-preview-container {
+          height: 100%;
+          overflow: hidden;
+          position: relative;
+          .video-player-container {
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 0;
+            bottom: -24px;
+          }
+          [id^=camera-preview-] {
+            width: 100%;
+            height: 100%;
+          }
+        }
+      }
+    }
+    .cameras-categories-block {
+      display: none;
+      margin: 3px 3px -37px;
+    }
+    .slider-main-tools {
+      display: none;
+    }
+
+  }
+}

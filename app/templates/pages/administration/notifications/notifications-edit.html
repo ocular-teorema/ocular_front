@@ -1,0 +1,177 @@
+<section class="main admin-container profile" ng-class="{'in-loading': sendForm}">
+    <div class="container clearfix">
+      <h1><a ui-sref="main.administration.notifications.list"><img src="/static/images/arrow_back.svg" alt=""></a>{{(notificationModel.id) ? 'Редактирование' : 'Создание'}} уведомления</h1>
+      <div class="profile__block">
+        <div class="profile__block profile__block--wide">
+        <form name="notificationForm" ng-submit="saveNotification(notificationForm)" 
+              class="profile__block__form">
+          <div class="form-field">
+              <span class="form-control-label">Группы камер:</span>
+              <div class="text-field text-field--group for-items-container">
+                  <span class="text-field-selected-item" ng-if="!selectedGroups.length">
+                      <span>Все группы&nbsp;&nbsp;</span>
+                  </span>
+                  <span class="text-field-selected-item" ng-repeat="group in selectedGroups">
+                      <span>{{ group.name }}</span>
+                      <i class="icon-delete" ng-click="removeGroup(group)">+</i>
+                  </span><span
+                      ng-init="groupsSelectOptions.showed = false;"
+                      ng-mousedown="hidden = !groupsSelectOptions.showed"
+                      ng-click="groupsSelectOptions.showed = hidden;"
+                      ng-if="cameraGroupsList.length > 1"
+                      class="text-field-selected-item add-btn">
+                      <i class="icon-plus">+</i>
+                  </span>
+              </div>
+              <div ng-select
+                   ng-select-change="onSelectGroup"
+                   ng-model-list="cameraGroupsList"
+                   ng-select-options="groupsSelectOptions"
+                   ng-select-options="{class: 'select-3'}"
+                   ng-model="cameras_groups"></div>
+          </div>
+          <div class="form-field">
+              <span class="form-control-label">Камеры:</span>
+              <div class="text-field text-field--camera for-items-container">
+                  <span class="text-field-selected-item" ng-if="!selectedCameras.length && (camerasList.length > 1)">
+                      <span ng-if="!selectedGroups.length">Все камеры&nbsp;&nbsp;</span>
+                      <span class="no-limit-width" ng-if="selectedGroups.length">Все камеры выбранных групп&nbsp;&nbsp;</span>
+                  </span>
+                  <span class="text-field-selected-item" ng-if="!selectedCameras.length && (camerasList.length <= 1)">
+                      <span class="no-limit-width">Нет доступных камер для выбора&nbsp;&nbsp;</span>
+                  </span>
+                  <span class="text-field-selected-item" ng-repeat="camera in selectedCameras">
+                      <span>{{ camera.name }}</span>
+                      <i class="icon-delete" ng-click="removeCamera(camera)">+</i>
+                  </span><span
+                      ng-init="camerasSelectOptions.showed = false;"
+                      ng-mousedown="hidden = !camerasSelectOptions.showed"
+                      ng-click="camerasSelectOptions.showed = hidden;"
+                      ng-if="camerasList.length > 1"
+                      class="text-field-selected-item add-btn">
+                      <i class="icon-plus">+</i>
+                  </span>
+              </div>
+              <div ng-select
+                   ng-if="camerasList.length > 1"
+                   ng-select-change="onSelectCamera"
+                   ng-model-list="camerasList"
+                   ng-select-options="camerasSelectOptions"
+                   ng-model="cameras_list"></div>
+          </div>
+          <div class="form-field form-field--event-types">
+            <label>
+              тип события
+              <br>
+              <!-- События -->
+            <div class="toolbox-fieldset">
+              <div class="toolbox-check-box">
+                  <input type="checkbox"
+                         id="motion_event"
+                         ng-model="notificationTypes['AREA']">
+                  <label for="motion_event">Движение в зоне</label>
+              </div>
+              <div class="toolbox-check-box">
+                  <input type="checkbox"
+                         id="leave_object_event"
+                         ng-model="notificationTypes['STATIC_OBJECT']">
+                  <label for="leave_object_event">Оставленный предмет</label>
+              </div>
+              <div class="toolbox-check-box">
+                  <input type="checkbox"
+                         id="velocity_event"
+                         ng-model="notificationTypes['VELOCITY']">
+                  <label for="velocity_event">Скорость движения</label>
+              </div>
+              <div class="toolbox-check-box">
+                  <input type="checkbox"
+                         id="wrong_direction_event"
+                         ng-model="notificationTypes['INVALID_MOTION']">
+                  <label for="wrong_direction_event">Вектор движения</label>
+              </div>
+              <div class="toolbox-check-box">
+                  <input type="checkbox"
+                         id="calibration_error"
+                         ng-model="notificationTypes['CALIBRATION_ERROR']">
+                  <label for="calibration_error">Ошибка калибровки</label>
+              </div>
+              <div class="toolbox-check-box">
+                  <input type="checkbox"
+                         id="people_count_error"
+                         ng-model="notificationTypes['PEOPLE_COUNT']">
+                  <label for="people_count_error">Толпа</label>
+              </div>
+          </div>
+            </label>
+          </div>
+          <div class="form-field form-field--cam-params">
+            <label>
+              параметры камеры <br>
+              <div class="form-field__row">
+                <div class="form-field">
+                  <label>
+                    с
+                    <br>
+                    <div ng-select
+                         ng-model-list="timesList"
+                         ng-model="notificationModel.notify_time_start"
+                         ng-select-options="{class: 'select-3'}"></div>
+                  </label>
+                </div>
+                <div class="form-field">
+                  <label>
+                    по
+                    <br>
+                    <div ng-select
+                         ng-model-list="timesList"
+                         ng-select-options="{class: 'select-3'}"
+                         ng-model="notificationModel.notify_time_stop"></div>
+                  </label>
+                </div>
+              </div>
+            </label>
+          </div>
+          <div class="form-field form-field--select form-field--select--fullwidth">
+            <label>
+              уровень опасности
+              <br>
+              <div ng-select
+              ng-model-list="displayingList"
+              ng-select-options="{class: 'select-3', label: 'label', value: 'value'}"
+              ng-model="notificationModel.notify_alert_level"></div>
+            </label>
+          </div>
+          <div class="form-field">
+            <span class="form-control-label">Камеры:</span>
+            <div class="text-field for-items-container">
+                <span class="text-field-selected-item" ng-if="!selectedUsers.length">
+                    <span>Все пользователи&nbsp;&nbsp;</span>
+                </span>
+                <span class="text-field-selected-item" ng-repeat="user in selectedUsers">
+                    <span>{{ user.fio }}</span>
+                    <i class="icon-delete" ng-click="removeUser(user)">+</i>
+                </span><span
+                    ng-init="usersSelectOptions.showed = false;"
+                    ng-mousedown="hidden = !usersSelectOptions.showed"
+                    ng-click="usersSelectOptions.showed = hidden;"
+                    ng-if="usersList.length > 1"
+                    class="text-field-selected-item add-btn">
+                    <i class="icon-plus">+</i>
+                </span>
+            </div>
+            <div ng-select
+                 ng-if="usersList.length > 1"
+                 ng-select-change="onSelectUser"
+                 ng-model-list="usersList"
+                 ng-select-options="usersSelectOptions"
+                 ng-model="cameras_list"></div>
+          </div>
+          <button type="submit" class="button">Сохранить</button>
+        </form>
+        <button type="submit" ng-if="notificationModel.id"
+                ng-click="deleteNotification()"
+                class="button button--dell">Удалить уведомление</button>
+      </div>
+      </div>
+    </div>
+  </section>

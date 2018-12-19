@@ -1,0 +1,89 @@
+<section class="main admin-container profile" ng-class="{'in-loading': sendForm}">
+  <div class="container clearfix">
+    <h1>{{ (state.current.data.isNewServer) ? 'Добавление' : 'Редактирование'}} сервера</h1>
+    <div class="profile__block">
+      <div class="profile__block profile__block--wide">
+        <form name="serverForm" ng-submit="saveServer(serverForm)" class="profile__block__form">
+          <div class="form-field form-field--required">
+            <label>
+              Название
+              <br>
+              <input ng-model="serverModel.name" class="form-field__input" required type="text">
+            </label>
+          </div>
+          <div class="form-field form-field--required 
+                  form-field--required--select 
+                  form-field--required--select--fullwidth">
+            <label>
+              организация <br>
+              <div
+                ng-select
+                ng-model="serverModel.organization"
+                ng-model-list="organizationsList"
+                ng-select-options="{class: 'select-3', label: 'name', value: 'id'}"></div>
+            </label>
+          </div>
+          <div class="form-field form-field--required">
+            <label>
+              ip-адрес
+              <br>
+              <input ng-model="serverModel.address" class="form-field__input" required type="text">
+            </label>
+          </div>
+          <div class="form-field form-field--checks">
+            <label>тип</label>
+            <div class="form-field__row form-field__row--no-padding">
+              <label>
+                <input  ng-disabled="serverModel.type == 'storage'" 
+                ng-model="serverModel.type"
+                ng-true-value="'storage'" 
+                       type="checkbox">
+                <div class="form-field__check-price">
+                  <div class="form-field__check-price__title">
+                    Хранение
+                  </div>
+                </div>
+              </label>
+              <label>
+                <input  ng-disabled="serverModel.type == 'analysis'" 
+                ng-model="serverModel.type"
+                ng-true-value="'analysis'" 
+                       type="checkbox">
+                <div class="form-field__check-price">
+                  <div class="form-field__check-price__title">
+                    Анализ
+                  </div>
+                </div>
+              </label>
+              <label>
+                <input  ng-disabled="serverModel.type == 'full'" 
+                ng-model="serverModel.type"
+                ng-true-value="'full'" 
+                       type="checkbox">
+                <div class="form-field__check-price">
+                  <div class="form-field__check-price__title">
+                    Хранение и аналитика
+                  </div>
+                </div>
+              </label>
+            </div>
+          </div>
+          <div ng-if="serverModel.type === 'storage'" class="form-field form-field--required 
+                  form-field--required--select 
+                  form-field--required--select--fullwidth">
+            <label>
+              Родительский сервер <br>
+              <div
+                ng-select
+                ng-model="serverModel.parent_server_id"
+                ng-model-list="serversAnalysisList"
+                ng-select-options="{class: 'select-3', label: 'name', value: 'id'}"></div>
+            </label>
+          </div>
+          <button type="submit" class="button">Сохранить</button>
+        </form>
+        <button ng-if="serverModel.id" ng-click="deleteServer()" class="button button--dell">Удалить сервер</button>
+      </div>
+    </div>
+  </div>
+</section>

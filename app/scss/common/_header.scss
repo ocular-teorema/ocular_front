@@ -1,0 +1,127 @@
+header {
+  height: 11.1em;
+  position: relative;
+  background-color: #fff;
+  z-index: 3;
+  & + .submenu {
+    background-color: #2b91ed;
+    position: relative;
+    z-index: 2;
+    ul {
+      margin: 0;
+      padding: 0;
+      display: flex;
+      list-style-type: none;
+      li {
+        position: relative;
+        &.active {
+          &:after {
+            content: '';
+            position: absolute;
+            display: block;
+            left: calc(50% - 8px);
+            bottom: 0;
+            border: 8px solid transparent;
+            border-bottom: 8px solid #fff;
+            margin: 0;
+          }
+        }
+        a {
+          color: #fff;
+          text-decoration: none;
+          font-size: 1.6em;
+          line-height: 2.625em;
+          height: 2.625em;
+          margin: 0 30px;
+          display: block;
+        }
+      }
+    }
+  }
+  .container {
+    height: inherit;
+    position: relative;
+  }
+  .logo {
+    width: 18.8em;
+    height: 6em;
+    position: absolute;
+    top: 1.9em;
+    left: 3em;
+    img {
+      display: block;
+      height: 100%;
+    }
+  }
+  nav {
+    position: absolute;
+    bottom: 0;
+    left: 30em;
+    li {
+      float: left;
+      margin-right: 1.4em;
+      width: 170px;
+      &.active a {
+        background: #2b91ed;
+        color: #fff;
+      }
+    }
+    a {
+      height: 2.625em;
+      background: #e6e6e6;
+      font-size: 1.6em;
+      text-decoration: none;
+      line-height: 2.625em;
+      width: 100%;
+      text-align: center;
+      text-align: center;
+      display: block;
+      border-radius: 5px 5px 0 0;
+    }
+    ul {
+      margin: 0;
+      padding: 0;
+      list-style-type: none;
+      &.openSub {
+        li {
+          &:nth-child(3) {
+            a {
+              background: #2b91ed;
+              color: #fff;
+            }
+          }
+        }
+      }
+      &.openAdminSub {
+        li {
+          &:last-child {
+            a {
+              background: #2b91ed;
+              color: #fff;
+            }
+          }
+        }
+      }
+    }
+  }
+  .user {
+    min-height: 3.43em;
+    background: url(images/user-placeholder.png) no-repeat;
+    position: absolute;
+    top: 2.643em;
+    right: 2.93em;
+    box-sizing: border-box;
+    padding: 0.43em 0 0 3.643em;
+    font-size: 1.4em;
+    .user-name {
+      display: block;
+      &--fio {
+        font-weight: bold;
+        margin-top: -0.43em;
+      }
+    }
+  }
+  .view-box {
+    display: none;
+  }
+}

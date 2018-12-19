@@ -1,0 +1,50 @@
+<section class="main users admin-container profile">
+    <div class="container clearfix">
+        <h1>Список квадраторов</h1>
+        <a ui-sref="main.administration.quadrators.edit" class="button button--grad">Добавить</a>
+        <table class="list">
+            <thead>
+                <tr>
+                    <td>
+                        <span>Название</span>
+                    </td>
+                    <td>
+                        <span>Камер по ширине</span>
+                    </td>
+                    <td>
+                        <span>Камер по высоте</span>
+                    </td>
+                    <td>
+                        <span>FPS</span>
+                    </td>
+                    <td>
+                        <span>Качество</span>
+                    </td>
+                    <td>
+                        <span>Разрешение выходного потока</span>
+                    </td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="quadrator in quadrators">
+                    <td>{{ quadrator.name }}</td>
+                    <td>{{ quadrator.num_cam_x }}</td>
+                    <td>{{ quadrator.num_cam_y }}</td>
+                    <td>{{ quadrator.output_FPS || 'Auto' }}</td>
+                    <td>{{ quadrator.output_quality }}</td>
+                    <td>{{ quadrator.output_width }}x{{ quadrator.output_height }}</td>
+                    <td>
+                        <a ui-sref="main.administration.quadrators.edit({quadratorId: quadrator.id})">
+                            <img src="/static/images/buttons/set.svg" alt="">
+                        </a>
+                    </td>
+                    <td>
+                        <a href="" ng-click="deleteQuadrator(quadrator)"><img src="/static/images/buttons/del.svg" alt=""></a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</section>

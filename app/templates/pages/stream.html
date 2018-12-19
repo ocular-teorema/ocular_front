@@ -1,0 +1,109 @@
+<div class="stream-panel">
+    <div class="stream-panel__part">
+        <div ng-select
+             style="min-width: 250px;"
+             ng-model="camerasQuadrator"
+             ng-model-list="quadratorsList"
+             ng-select-options="{'class': 'select-3', label: 'name'}"
+        ></div>
+        &nbsp;&nbsp;&nbsp;
+
+        <div class="camera-choose-box">
+            <div ng-select
+                 ng-select-change="onSelectDanger"
+                 ng-model-list="displayingList"
+                 ng-select-options="{class: 'select-3', label: 'label', value: 'value'}"
+                 ng-model="confidence"></div>
+        </div>
+    </div>
+    <div class="stream-panel__part">
+        <!--<div class="stream-panel__item">-->
+            <!--<img ng-click="setFullScreenMode()" src="/static/images/304.svg">-->
+        <!--</div>-->
+        <div class="stream-panel__item stream-panel__item--date">
+            <div>{{ date | date : 'HH:mm:ss' }}</div>
+            <div>{{ date | date : 'dd.MM.yyyy' }} {{ daysOfWeek[date.getDay()] }}</div>
+        </div>
+    </div>
+</div>
+
+<div class="cameras-table" ng-if="!selectedCamera && camerasQuadrator.full_cameras.length">
+    <div class="cameras-table-wrapper">
+        <div ng-if="svgImg" ng-bind-html="svgImg" class="img-wrapper"></div>
+        <div class="cameras-table__list">
+            <div class="cameras-table__item"
+                 ng-repeat="camera in camerasQuadrator.full_cameras track by $index"
+                 ng-style="{width: camSize + '%'}">
+                <img class="size-img" ng-src="/static/images/{{selectedSize}}.gif">
+                <div class="camera-stream-box"
+                     ng-class="{'camera-alert': camera.latestEvents.length}"
+                     ng-click="setSelectedCamera(camera)">
+                    <div class="cameras-categories-container without-arrow">
+                <span class="camera-name">
+                    <span class="camera-name-title with-analize-icon {{camera['analysis-icon']}}">
+                        <span class="camera-name-title-text"
+                              title="{{ camera.camera_group.name }} - {{ camera.name }}">
+                            {{ camera.camera_group.name }} - {{ camera.name }}</span>
+                    </span>
+                </span>
+                    </div>
+                </div>
+
+                <div class="camera-event-buttons"
+                     ng-if="camera.latestEvents.length">
+                    <button class="camera-event-btn" ng-click="securityReaction(1, camera)">
+                        запомнить
+                        <img src="/static/images/buttons/attention.svg"/>
+                    </button>
+                    <button class="camera-event-btn" ng-click="securityReaction(0, camera)">
+                        ложно
+                        <img src="/static/images/buttons/skip.svg"/>
+                    </button>
+                </div>
+
+                <div class="camera-event-buttons"
+                     ng-if="camera.noReactionEvents.length && !camera.latestEvents.length">
+                    <a href="#" class="camera-event-btn" ng-click="openEvent(camera)">
+                        пересмотреть
+                        <img src="/static/images/buttons/repeat.svg"/>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="video-stream" style="width: 100%; height: 100%;">
+            <video id="quadrator-video-stream" ng-if="showVideoContainer" ng-mse-player="{stream: camerasQuadrator.ws_video_url}"></video>
+        </div>
+    </div>
+
+</div>
+
+
+<div class="cameras-table" ng-if="selectedCamera">
+    <div class="cameras-table-wrapper">
+        <div class="img-wrapper">
+            <img class="cameras-table-size_img" ng-src="/static/images/{{selectedSize}}.gif">
+        </div>
+
+        <div class="cameras-table__list">
+            <div class="cameras-table__item"
+                 ng-style="{width: '100%'}">
+                <img class="size-img" ng-src="/static/images/{{selectedSize}}.gif">
+                <div class="camera-stream-box" ng-click="closeSelectedCamera()">
+                    <div class="cameras-categories-container without-arrow">
+                        <span class="camera-name">
+                            <span class="camera-name-title with-analize-icon {{selectedCamera['analysis-icon']}}">
+                                <span class="camera-name-title-text"
+                                      title="{{ selectedCamera.camera_group.name }} - {{ selectedCamera.name }}">
+                                    {{ selectedCamera.camera_group.name }} - {{ selectedCamera.name }}</span>
+                            </span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="video-stream" style="width: 100%; height: 100%;">
+            <video id="camera-video-stream" ng-mse-player="{stream: selectedCamera.ws_video_url}"></video>
+        </div>
+    </div>
+</div>
+

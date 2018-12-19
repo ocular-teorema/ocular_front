@@ -1,0 +1,269 @@
+<section class="main admin-container profile" ng-class="{'in-loading': sendForm}">
+  <div class="container clearfix">
+    <h1><a ui-sref="main.administration.cameras.list"><img src="/static/images/arrow_back.svg" alt=""></a>{{(cameraModel.id) ? 'Редактирование' : 'Добавление'}} камеры</h1>
+    <div class="profile__block">
+      <div class="profile__block profile__block--wide">
+      <form name="cameraForm" ng-submit="saveCamera(cameraForm)" class="profile__block__form">
+        <div class="form-field form-field--required">
+          <label>
+            название камеры
+            <br>
+            <input 
+            ng-model="cameraModel.name" class="form-field__input" required type="text">
+          </label>
+        </div>
+        <div ng-if="state.current.data.isNewCamera  && !currentUser.organization" 
+        class="form-field form-field--required 
+                form-field--required--select 
+                form-field--required--select--fullwidth">
+          <label>
+            организация <br>
+            <div
+              ng-select
+              ng-model="cameraModel.organization"
+              ng-model-list="organizationsList"
+              ng-select-options="{class: 'select-3', label: 'name', value: 'id'}"></div>
+          </label>
+        </div>
+        <div class="form-field form-field--required 
+                    form-field--required--select
+                    form-field--required--select--fullwidth">
+          <label class="group-camera-list">
+            Группа камер <br>
+            <div ng-select
+                ng-model-list="cameraGroupsList"
+                ng-autocomplete-field="newCamerasGroup"
+                ng-select-options="{class: 'select-3', label: 'name', value: 'id', autocomplete: true}"
+                ng-model="cameraModel.camera_group"></div>
+          </label>
+        </div>
+        <div class="form-field form-field--required">
+          <label>
+            url потока:
+            <br>
+            <input 
+            placeholder="rtsp://admin:admin@90.284.59.33:564"
+            ng-model="cameraModel.address" class="form-field__input" required type="url">
+          </label>
+        </div>
+        <div class="form-field form-field--required">
+          <label>
+            путь хранения:
+            <br>
+            <input 
+            ng-model="cameraModel.archive_path" class="form-field__input" required type="text">
+          </label>
+        </div>
+        <div class="form-field form-field--required 
+                form-field--required--select 
+                form-field--required--select--fullwidth">
+          <label>
+            Сервер <br>
+            <div
+              ng-select
+              ng-model="cameraModel.server"
+              ng-model-list="serversList"
+              ng-select-options="{class: 'select-3', label: 'name', value: 'id'}"></div>
+          </label>
+        </div>
+        <!-- div class="form-field form-field--cam-params">
+          <label>
+            параметры камеры <br>
+            <div class="form-field__row">
+              <div class="form-field">
+                <label>
+                  fps
+                  <br>
+                  <div ng-select
+                      ng-model="cameraModel.fps"
+                      ng-model-list="fpsList"
+                      ng-select-options="{class: 'select-3', label: 'label', value: 'value'}"></div>
+                </label>
+              </div>
+              <div class="form-field">
+                <label>
+                  разрешение
+                  <br>
+                  <div ng-select
+                      ng-model="cameraModel.resolution"
+                      ng-model-list="resolutionsList"
+                      ng-select-options="{class: 'select-3', label: 'label', value: 'value'}"></div>
+                </label>
+              </div>
+            </div>
+          </label>
+        </div -->
+        <div class="form-field form-field--checks">
+          <label>срок хранения</label>
+          <div class="form-field__row form-field__row--no-padding">
+            <label>
+              <input ng-disabled="cameraModel.storage_life == 7"
+                  ng-model="cameraModel.storage_life" 
+                    ng-true-value="7"
+                    type="checkbox">
+              <div class="form-field__check-price">
+                <div class="form-field__check-price__title">
+                  7 дней
+                </div>
+                <!-- <div class="form-field__check-price__subtitle">
+                  150 
+                </div> -->
+              </div>
+            </label>
+            <label>
+              <input ng-disabled="cameraModel.storage_life == 15" 
+                    ng-model="cameraModel.storage_life" 
+                    ng-true-value="15"
+                    type="checkbox">
+              <div class="form-field__check-price">
+                <div class="form-field__check-price__title">
+                  15 дней
+                </div>
+                <!-- <div class="form-field__check-price__subtitle">
+                  250 
+                </div> -->
+              </div>
+            </label>
+            <label>
+              <input ng-disabled="cameraModel.storage_life == 30" 
+                    ng-model="cameraModel.storage_life" 
+                    ng-true-value="30"
+                    type="checkbox">
+              <div class="form-field__check-price">
+                <div class="form-field__check-price__title">
+                  30 дней
+                </div>
+                <!-- <div class="form-field__check-price__subtitle">
+                  350 
+                </div> -->
+              </div>
+            </label>
+            <label>
+              <input ng-disabled="cameraModel.storage_life == 1000" 
+                    ng-model="cameraModel.storage_life" 
+                    ng-true-value="1000"
+                    type="checkbox">
+              <div class="form-field__check-price">
+                <div class="form-field__check-price__title">
+                  Бессрочно
+                </div>
+                <!-- <div class="form-field__check-price__subtitle">
+                  0
+                </div> -->
+              </div>
+            </label>
+          </div>
+        </div>
+        <div class="form-field form-field--checks">
+          <label>тип анализа видеопотока</label>
+          <div class="form-field__row form-field__row--no-padding">
+            <label>
+              <input  ng-disabled="cameraModel.analysis == 1" 
+              ng-model="cameraModel.analysis"
+              ng-true-value="1" 
+                     type="checkbox">
+              <div class="form-field__check-price">
+                <div class="form-field__check-price__title">
+                  только запись
+                </div>
+                <!-- <div class="form-field__check-price__subtitle">
+                  0 
+                </div> -->
+              </div>
+            </label>
+            <label>
+              <input ng-disabled="cameraModel.analysis == 2" 
+              ng-model="cameraModel.analysis"
+              ng-true-value="2" 
+                     type="checkbox">
+              <div class="form-field__check-price">
+                <div class="form-field__check-price__title">
+                  только движение
+                </div>
+                <!-- <div class="form-field__check-price__subtitle">
+                  +150 
+                </div> -->
+              </div>
+            </label>
+            <label>
+              <input ng-disabled="cameraModel.analysis == 3" 
+              ng-model="cameraModel.analysis"
+              ng-true-value="3" 
+                     type="checkbox">
+              <div class="form-field__check-price">
+                <div class="form-field__check-price__title">
+                  полный анализ
+                </div>
+                <!-- <div class="form-field__check-price__subtitle">
+                  +300 
+                </div> -->
+              </div>
+            </label>
+          </div>
+        </div>
+        <!-- <div class="form-field form-field--checks">
+          <label>оплатить камеру</label>
+          <div class="form-field__row form-field__row--no-padding">
+            <label>
+              <input type="checkbox">
+              <div class="form-field__check-price">
+                <div class="form-field__check-price__title">
+                  1 месяц
+                </div>
+                <div class="form-field__check-price__subtitle">
+                  150 
+                </div>
+              </div>
+            </label>
+            <label>
+              <input type="checkbox">
+              <div class="form-field__check-price">
+                <div class="form-field__check-price__title">
+                  3 месяца
+                </div>
+                <div class="form-field__check-price__subtitle">
+                  250 
+                </div>
+              </div>
+            </label>
+            <label>
+              <input type="checkbox">
+              <div class="form-field__check-price">
+                <div class="form-field__check-price__title">
+                  6 месяцев
+                </div>
+                <div class="form-field__check-price__subtitle">
+                  550 
+                </div>
+              </div>
+            </label>
+            <label>
+              <input type="checkbox">
+              <div class="form-field__check-price">
+                <div class="form-field__check-price__title">
+                  1 год
+                </div>
+                <div class="form-field__check-price__subtitle">
+                  999 
+                </div>
+              </div>
+            </label>
+          </div>
+        </div> -->
+        <button type="submit" class="button">Сохранить</button>
+        <button type="button"
+              ng-click="startCamera()"
+              ng-if="cameraModel.id && !cameraModel.is_active" 
+              class="button">Запустить</button>
+        <button type="button"
+              ng-click="stopCamera()"
+              ng-if="cameraModel.id && cameraModel.is_active" 
+              class="button">Остановить</button>
+      </form>
+      <button type="button" ng-if="cameraModel.id"
+              ng-click="deleteCamera()"
+              class="button button--dell">Удалить камеру</button>
+    </div>
+    </div>
+  </div>
+</section>

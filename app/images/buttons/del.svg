@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 48 (47235) - http://www.bohemiancoding.com/sketch -->
+    <title>del</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="lk_07" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" transform="translate(-1151.000000, -396.000000)">
+        <path d="M1163,420 C1156.4,420 1151,414.6 1151,408 C1151,401.4 1156.4,396 1163,396 C1169.6,396 1175,401.4 1175,408 C1175,414.6 1169.6,420 1163,420 L1163,420 Z M1169,403.68 L1167.32,402 L1163,406.32 L1158.68,402 L1157,403.68 L1161.32,408 L1157,412.32 L1158.68,414 L1163,409.68 L1167.32,414 L1169,412.32 L1164.68,408 L1169,403.68 L1169,403.68 Z" id="del" fill="#787878"></path>
+    </g>
+</svg>

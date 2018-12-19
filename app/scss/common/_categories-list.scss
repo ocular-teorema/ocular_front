@@ -1,0 +1,108 @@
+
+.cameras-categories-list {
+  position: absolute;
+  top: 100%;
+  color: #fff;
+  background-color: rgba(66, 76, 88, 0.9);
+  line-height: 15px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  display: none;
+  left: -1px;
+  right: -1px;
+  overflow: auto;
+  .camera-stream-container.active & {
+    display: block;
+  }
+  ul {
+    padding: 0;
+    margin: 0;
+    list-style-type: none;
+  }
+  li {
+  }
+  .categories-drop-item.active-group {
+    .categories-drop-item-name {
+      &:after {
+        border-width: 0 4px 6px;
+      }
+    }
+    .categories-drop-cameras-list {
+      display: block;
+    }
+  }
+  .categories-drop-item-name {
+    color: #7d8288;
+    text-transform: uppercase;
+    display: block;
+    padding: 12px;
+    overflow: hidden;
+    &:after {
+      content: '';
+      display: inline-block;
+      verticala-lign: middle;
+      margin-left: 15px;
+      border-width: 6px 4px 0;
+      border-style: solid;
+      border-color: #fff transparent;
+    }
+    &:hover {
+      color: #ad8212;
+      background-color: rgba(66, 76, 88, 1);
+    }
+  }
+  .categories-drop-cameras-item-name {
+    display: block;
+    padding: 10px 0 10px 65px;
+    font-weight: 700;
+    overflow: hidden;
+    &:hover {
+      color: #ffc119;
+      background-color: rgba(66, 76, 88, 1);
+    }
+  }
+  .categories-drop-cameras-list {
+    display: none;
+    .camera-used {
+      position: relative;
+      &:before {
+        position: absolute;
+        content: '';
+        width: 13px;
+        height: 13px;
+        border-radius: 50%;
+        background-color: #02ab03;
+        top: 11px;
+        left: 36px;
+        z-index: 2;
+      }
+    }
+  }
+}
+
+.with-analize-icon {
+  &:after {
+    content: '';
+    width: 20px;
+    height: 20px;
+    margin: -5px 8px 0;
+    display: inline-block;
+    background: no-repeat center center;
+    vertical-align: middle;
+  }
+  &.motion-analize {
+    &:after {
+      background-image: url(images/analize-type/icon01.png);
+    }
+  }
+  &.record-analize {
+    &:after {
+      background-image: url(images/analize-type/icon05.png);
+    }
+  }
+  &.full-analize {
+    &:after {
+      background-image: url(images/analize-type/icon03.png);
+    }
+  }
+}

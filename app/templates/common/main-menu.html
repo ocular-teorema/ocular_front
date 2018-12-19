@@ -1,0 +1,12 @@
+<ul ng-controller="mainMenuController"
+    ng-class="{openSub: state.current.parent == 'main.administration',
+               openAdminSub: state.current.parent == 'main.adminsettings'}">
+    <li ng-repeat="itemMenu in mainMenu | isCompanyMenu" class="main-menu-item"
+        ng-class="{active: state.current.name == itemMenu.ROUTE}"
+        ng-if="itemMenu | adminMenu"
+        data-title="{{ itemMenu.TITLE }}">
+        <a ui-sref="{{ itemMenu.ROUTE }}">
+            {{ itemMenu.TITLE }}
+        </a>
+    </li>
+</ul>

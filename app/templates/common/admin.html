@@ -1,0 +1,7 @@
+<div class="user-main-holder">
+    <header ng-include="'/static/templates/common/header.html'"></header>
+    <div class="submenu" ng-include="'/static/templates/common/submenu.html'"
+    ng-if="!itemMenu.is_organization_admin || currentUser.admin"></div>
+    <div ui-view class="base-content-wrapper"></div>
+    <audio src="/static/media/Radar.mp3" preload="auto" id="beep"></audio>
+</div>

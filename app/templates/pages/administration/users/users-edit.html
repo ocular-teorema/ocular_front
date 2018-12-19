@@ -1,0 +1,137 @@
+<section class="main admin-container profile" ng-class="{'in-loading': sendForm}">
+    <div class="container clearfix">
+      <h1><a ui-sref="main.administration.users.list"><img src="/static/images/arrow_back.svg" alt=""></a>{{(userModel.id) ? 'Редактирование' : 'Добавление'}} пользователя</h1>
+      <div class="profile__block">
+        <div class="profile__block profile__block--wide">
+        <form name="profileForm" ng-submit="saveUser(profileForm)" class="profile__block__form">
+          <div class="form-field form-field--required">
+            <label>
+              Логин
+              <br>
+              <input ng-model="userModel.username" class="form-field__input" required type="text">
+            </label>
+          </div>
+          <div class="form-field form-field--required">
+            <label>
+              Пароль
+              <br>
+              <input ng-model="userModel.password" class="form-field__input" required type="password">
+            </label>
+          </div>
+          <div ng-if="state.current.data.isNewUser && !currentUser.organization" 
+              class="form-field form-field--required form-field--required--select form-field--required--select--fullwidth">
+            <label>
+              организация <br>
+              <div
+                ng-select
+                ng-model="userModel.organization"
+                ng-model-list="organizationsList"
+                ng-select-options="{class: 'select-3', label: 'name', value: 'id'}"></div>
+            </label>
+          </div>
+          <div  ng-if="state.current.data.isNewUser && !currentUser.organization" 
+                class="form-field form-field--required form-field--required--select form-field--required--select--fullwidth">
+            <label>
+              Роль <br>
+              <div
+                ng-select
+                ng-model="userModel.is_organization_admin"
+                ng-model-list="userRolesList"
+                ng-select-options="{class: 'select-3', label: 'label', value: 'value'}"></div>
+            </label>
+          </div>
+          <div class="form-field">
+              <span class="form-control-label">Группы камер:</span>
+              <div class="text-field text-field--group for-items-container">
+                  <span class="text-field-selected-item" ng-if="!selectedGroups.length">
+                      <span>Все группы&nbsp;&nbsp;</span>
+                  </span>
+                  <span class="text-field-selected-item" ng-repeat="group in selectedGroups">
+                      <span>{{ group.name }}</span>
+                      <i class="icon-delete" ng-click="removeGroup(group)">+</i>
+                  </span><span
+                      ng-init="groupsSelectOptions.showed = false;"
+                      ng-mousedown="hidden = !groupsSelectOptions.showed"
+                      ng-click="groupsSelectOptions.showed = hidden;"
+                      ng-if="cameraGroupsList.length > 1"
+                      class="text-field-selected-item add-btn">
+                      <i class="icon-plus">+</i>
+                  </span>
+              </div>
+              <div ng-select
+                   ng-select-change="onSelectGroup"
+                   ng-model-list="cameraGroupsList"
+                   ng-select-options="groupsSelectOptions"
+                   ng-select-options="{class: 'select-3'}"
+                   ng-model="cameras_groups"></div>
+          </div>
+          <div class="form-field">
+              <span class="form-control-label">Камеры:</span>
+              <div class="text-field text-field--camera for-items-container">
+                  <span class="text-field-selected-item" ng-if="!selectedCameras.length && (camerasList.length > 1)">
+                      <span ng-if="!selectedGroups.length">Все камеры&nbsp;&nbsp;</span>
+                      <span class="no-limit-width" ng-if="selectedGroups.length">Все камеры выбранных групп&nbsp;&nbsp;</span>
+                  </span>
+                  <span class="text-field-selected-item" ng-if="!selectedCameras.length && (camerasList.length <= 1)">
+                      <span class="no-limit-width">Нет доступных камер для выбора&nbsp;&nbsp;</span>
+                  </span>
+                  <span class="text-field-selected-item" ng-repeat="camera in selectedCameras">
+                      <span>{{ camera.name }}</span>
+                      <i class="icon-delete" ng-click="removeCamera(camera)">+</i>
+                  </span><span
+                      ng-init="camerasSelectOptions.showed = false;"
+                      ng-mousedown="hidden = !camerasSelectOptions.showed"
+                      ng-click="camerasSelectOptions.showed = hidden;"
+                      ng-if="camerasList.length > 1"
+                      class="text-field-selected-item add-btn">
+                      <i class="icon-plus">+</i>
+                  </span>
+              </div>
+              <div ng-select
+                   ng-if="camerasList.length > 1"
+                   ng-select-change="onSelectCamera"
+                   ng-model-list="camerasList"
+                   ng-select-options="camerasSelectOptions"
+                   ng-model="cameras_list"></div>
+          </div>
+          <!-- <div class="form-field form-field--required">
+            <label>
+              эл. почта для восстановления пароля
+              <br>
+              <input ng-model="user.email" class="form-field__input" required type="email">
+            </label>
+          </div> -->
+  
+          <div class="form-field form-field--required">
+            <label>
+              фио
+              <br>
+              <input ng-model="userModel.fio" class="form-field__input" required type="text">
+            </label>
+          </div>
+          <div class="form-field">
+            <label>
+              эл. почта для уведомлений
+              <br>
+              <input ng-model="userModel.email" class="form-field__input" type="email">
+            </label>
+          </div>
+          <div class="form-field">
+            <label>
+              телефон для смс
+              <br>
+              <input class="form-field__input"
+              ng-model="userModel.phone"
+              ng-mask="{mask: '+7(999)999-99-99'}"
+              type="text">
+            </label>
+          </div>
+          <button type="submit" class="button">Сохранить</button>
+        </form>
+        <button type="submit" ng-if="userModel.id"
+                ng-click="deleteUser()"
+                class="button button--dell">Удалить пользователя</button>
+      </div>
+      </div>
+    </div>
+  </section>

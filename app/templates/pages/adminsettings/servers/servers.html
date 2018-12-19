@@ -1,0 +1,27 @@
+<section class="main users admin-container profile">
+  <div class="container clearfix">
+    <h1>Список серверов</h1>
+    <a ui-sref="main.adminsettings.servers.create()" class="button button--grad">Добавить</a>
+    <table ng-init="sortUsers('username')" class="list">
+      <thead>
+        <tr>
+          <td ng-repeat="title in tableTitles"
+              ng-click="sortServers(title.key)"
+              ng-class="{sorted: title.key === sortField}">
+              <span>{{title.name}}</span></td>
+          <td></td>
+          <td></td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr ng-repeat="server in serversList">
+          <td>{{ server.name }}</td>
+          <td>{{ serverTypes[server.type] }}</td>
+          <td>{{server.address}}</td>
+          <td><a href="" ui-sref="main.adminsettings.servers.edit({serverId: server.id})"><img src="/static/images/buttons/set.svg" alt=""></a></td>
+          <td><a href="" ng-click="deleteServer(server)"><img src="/static/images/buttons/del.svg" alt=""></a></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>

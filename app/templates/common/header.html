@@ -1,0 +1,15 @@
+<div class="container">
+
+    <a href="/" class="logo">
+        <img src="/static/images/logo.png">
+    </a>
+
+    <nav ng-include="'/static/templates/common/main-menu.html'"
+         ng-controller="mainMenuController"></nav>
+
+    <div class="user">
+        <span class="user-name user-name--fio" ng-if="currentUser.fio.length">{{currentUser.fio}}</span>
+        <span class="user-name">{{currentUser.is_organization_admin ? 'Начальник' : 'Сотрудник'}} охраны</span>
+        <a ui-sref="logout">Выйти</a>
+    </div> 
+</div>
