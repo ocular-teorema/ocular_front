@@ -41,7 +41,7 @@ module.directive('ngMsePlayer', function($timeout) {
             };
 
 
-            $timeout(iniPlayer, 10);
+            iniPlayer();
 
             $scope.$on('$destroy', function() {
                 element.empty().remove();
