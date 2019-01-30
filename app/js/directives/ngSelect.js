@@ -31,7 +31,7 @@ module.directive('ngSelect', function() {
                 $scope.inputBlur();
             };
             $scope.toggleList = function($event) {
-                $event.preventDefault();
+                // $event.preventDefault();
                 $scope.ngSelectOptions.showed = !$scope.ngSelectOptions.showed;
             };
 
@@ -62,8 +62,10 @@ module.directive('ngSelect', function() {
             };
 
             $scope.filterOptionsList = function(val) {
-                var regExp = new RegExp('^' + val + '[\s\S]*', 'i');
 
+                val = val.replace(/([\[\\^$.|?*+()])/ig, '\\$1');
+
+                var regExp = new RegExp('^' + val + '[\s\S]*', 'i');
                 $scope.showedList = $scope.ngOptionsList.filter(function(item) {
                     return regExp.test($scope.ngSelectOptions.label ? $scope.getLabelModel(item, $scope.ngSelectOptions.label) : item);
                 });
@@ -93,6 +95,7 @@ module.directive('ngSelect', function() {
             $scope.inputBlur = function() {
                 $scope.ngSelectOptions.showed = false;
                 autoFocused = false;
+                $scope.showedList = $scope.ngOptionsList;
                 $scope.ngAutocompleteField = $scope.ngModel ?
                     $scope.ngSelectOptions.label ? $scope.getLabelModel($scope.selectedOption, $scope.ngSelectOptions.label) : $scope.selectedOption : $scope.ngAutocompleteField;
             };
@@ -161,7 +164,6 @@ module.directive('ngSelect', function() {
                 if ($scope.selectedOption && !autoFocused) {
                     $scope.ngAutocompleteField = $scope.ngSelectOptions.label ?
                         $scope.getLabelModel($scope.selectedOption, $scope.ngSelectOptions.label) : $scope.selectedOption;
-                    console.log($scope.ngAutocompleteField);
                 }
             });
         },

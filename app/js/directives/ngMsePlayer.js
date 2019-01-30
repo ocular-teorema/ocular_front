@@ -18,6 +18,7 @@ module.directive('ngMsePlayer', function($timeout) {
                 element = currentMedia;
             };
 
+            
             var currentMedia;
             var reconnectTime;
             var iniPlayer = function() {
