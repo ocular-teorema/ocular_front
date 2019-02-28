@@ -12,10 +12,10 @@ var extensionsPattern = allowedExtensions.map(function (extension) {
 
 var indexTemplates = ['login'].join('|');
 
-var proxyURL = 'http://80.254.48.93';
-// var proxyURL = 'http://78.46.97.176';
-// var socketURL = 'ws://78.46.97.176';
-var socketURL = 'ws://80.254.48.93';
+// var proxyURL = 'http://80.254.48.93';
+var proxyURL = 'http://78.46.97.176';
+var socketURL = 'ws://78.46.97.176';
+// var socketURL = 'ws://80.254.48.93';
 
 
 var devServerApi = {
