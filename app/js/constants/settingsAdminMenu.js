@@ -6,7 +6,7 @@ module.constant('settingsAdminMenu', [
     },
     {
         "ROUTE": "main.adminsettings.servers.list",
-        "TITLE": "Сервера"
+        "TITLE": "Серверы"
     },
     {
         "ROUTE": "main.adminsettings.organizations.list",

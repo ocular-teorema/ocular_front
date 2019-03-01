@@ -1,6 +1,7 @@
 var module = angular.module('app');
 module.controller('serversController', function($scope, Windows, ServersService, serversList) {
-  
+
+  console.log(serversList);
   $scope.serversList = serversList.data;
 
   $scope.tableTitles = [
@@ -16,20 +17,20 @@ module.controller('serversController', function($scope, Windows, ServersService,
       name: 'ip-адрес',
       key: 'address'
     },
-  ],
+  ];
 
   $scope.serverTypes = {
     storage: 'Хранение',
     analysis: 'Анализ',
     full: 'Анализ и хранение'
-  }
+  };
 
 
 
   $scope.sortServers = function (key) {
     $scope.serversList = _.sortBy($scope.serversList, [function (o) {return o[key]}])  
     $scope.sortField = key;
-  }
+  };
 
   $scope.sortServers('name');
 

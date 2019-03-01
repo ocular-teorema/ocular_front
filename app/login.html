@@ -48,8 +48,7 @@
         <span class="form-field_error form-field_error-required">Required</span>
     </div>
 
-    <div class="error-form" ng-if="authError">{{ authError }}</div>
-    <!--<div class="error-form">Неверный логин или пароль</div>-->
+    <div class="error-form" ng-if="authError" ng-bind="authError"></div>
 
     <button type="submit" class="submit-login-form">
         <span>Log in</span>

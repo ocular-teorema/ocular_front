@@ -19,12 +19,20 @@ module.controller('usersController', function($scope, $rootScope, UsersService, 
       key: "phone",
       name: 'телефон'
     },
-  ]
+    {
+        key: "role",
+        name: 'Роль'
+    }
+  ];
 
   $scope.sortUsers = function (key) {
-    $scope.users = _.sortBy($scope.users, [function (o) {return o[key]}])  
+    $scope.users = _.sortBy($scope.users, [function (o) {return o[key]}]);
     $scope.sortField = key;
-  }
+  };
+
+    $scope.users.forEach(function(user) {
+        user.role = user.is_staff ? 'Администратор' : user.is_organization_admin ? 'Начальник охраны' : 'Охранник';
+    });
 
   $scope.deleteUser = function(user) {
     Windows.confirm({

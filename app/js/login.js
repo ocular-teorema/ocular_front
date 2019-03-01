@@ -19,11 +19,9 @@ module.controller('loginController', function($scope, UsersService) {
                         errors.push(response.data[i]);
                     }
                     $scope.authError = errors.join('; ');
-                    $scope.$apply();
                     break;
                 default:
                     $scope.authError = 'Error #' + response.status;
-                    $scope.$apply();
                     break;
             }
         });

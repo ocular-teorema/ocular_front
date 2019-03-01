@@ -15,10 +15,10 @@
       </thead>
       <tbody>
         <tr ng-repeat="user in users">
-          <td>{{ user.username }}</td>
-          <td>{{ user.fio }}</td>
-          <td>{{ user.email }}</td>
-          <td>{{ user.phone }}</td>
+          <td ng-repeat="title in tableTitles">{{ user[title.key] }}</td>
+          <!--<td>{{ user.fio }}</td>-->
+          <!--<td>{{ user.email }}</td>-->
+          <!--<td>{{ user.phone }}</td>-->
           <td><a ui-sref="main.administration.users.edit({organizationId: user.organization, userId: user.id})"><img src="/static/images/buttons/set.svg" alt=""></a></td>
           <td><a href="" ng-click="deleteUser(user)"><img src="/static/images/buttons/del.svg" alt=""></a></td>
         </tr>
