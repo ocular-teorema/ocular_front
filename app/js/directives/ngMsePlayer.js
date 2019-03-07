@@ -33,7 +33,7 @@ module.directive('ngMsePlayer', function($timeout) {
             video.onplay = function() {
                 if (!startTimes) {
 
-                    video.currentTime = video.currentTime - 2;
+                    // video.currentTime = video.currentTime - 2;
 
                     startTimes = {
                         video: video.currentTime,
@@ -48,6 +48,7 @@ module.directive('ngMsePlayer', function($timeout) {
                             Math.max(1, (videoCorrectionTime + currTimeRange - currTime) / videoCorrectionTime),
                             1.5
                         );
+
                         console.log(video.playbackRate);
                     }, videoCorrectionTime);
                 }
