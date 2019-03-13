@@ -36,31 +36,81 @@
                                 </label>
                             </div>
                         </div>
+                        <div class="form-field form-field--required--select form-field--required--select--fullwidth">
+                            <label>
+                                Соотношение сторон отображения камер <br>
+                                <div ng-select
+                                     ng-model="selectedSize"
+                                     ng-model-list="resolutionsSelect"
+                                     ng-select-options="{class: 'select-3', label: 'size'}">
+                                </div>
+                            </label>
+                        </div>
 
-                        <table width="100%">
-                            <tr ng-repeat="(indy, y) in qudratorSize.num_cam_y track by $index">
-                                <td ng-repeat="(indx, x) in qudratorSize.num_cam_x track by $index">
+
+
+                        <table ng-attr-width="{{200 * qudratorSize.num_cam_x.length}}"
+                               class="create-quadrator-table"
+                               border="0" cellpadding="0" cellspacing="0">
+                            <tr ng-repeat="(indy, y) in qudratorSize.num_cam_y track by $index"
+                                ng-init="rowIndex = $index">
+                                <td ng-repeat="(indx, x) in qudratorSize.num_cam_x track by $index"
+                                    ng-if="!quadratorParams[indy * qudratorSize.num_cam_x.length + indx].hidden"
+                                    ng-attr-colspan="{{quadratorParams[indy * qudratorSize.num_cam_x.length + indx].cols || 1}}"
+                                    ng-attr-rowspan="{{quadratorParams[indy * qudratorSize.num_cam_x.length + indx].rows}}"
+                                    ng-attr-width="{{200 * (quadratorParams[indy * qudratorSize.num_cam_x.length + indx].cols || 1)}}px"
+                                    ng-attr-style="background-image: url(//{{currentQuadrator.cameras[indy * qudratorSize.num_cam_x.length + indx].serverModel.address}}:8080/cam{{currentQuadrator.cameras[indy * qudratorSize.num_cam_x.length + indx]['id']}}/thumb.jpg)">
+                                    <div class="create-quadrator-table__container">
+                                        <img class="cameras-table-size_img"
+                                             ng-attr-width="{{quadratorParams[indy * qudratorSize.num_cam_x.length + indx].width || 200}}px"
+                                             ng-src="/static/images/{{selectedSize.size.replace(':', 'x')}}.gif">
+                                    </div>
                                     <div ng-select
                                          ng-model="currentQuadrator.cameras[indy * qudratorSize.num_cam_x.length + indx]"
                                          ng-model-list="camerasList"
-                                         ng-select-options="{class: 'select-3', label: 'name', value: 'id'}">
+                                         ng-select-options="{class: 'select-3', label: 'name'}">
                                     </div>
+
+                                    <button class="quadrator-control quadrator-control_top"
+                                            ng-click="setNewSize(indy * qudratorSize.num_cam_x.length + indx, 'up')"
+                                            ng-if="quadratorParams[indy * qudratorSize.num_cam_x.length + indx].buttons.up"
+                                            type="button"></button>
+                                    <button class="quadrator-control quadrator-control_bottom"
+                                            ng-if="quadratorParams[indy * qudratorSize.num_cam_x.length + indx].buttons.down"
+                                            ng-click="setNewSize(indy * qudratorSize.num_cam_x.length + indx, 'down')"
+                                            type="button"></button>
+
+                                    <button class="quadrator-control quadrator-control_bottom_revert"
+                                            ng-if="quadratorParams[indy * qudratorSize.num_cam_x.length + indx].toBottom"
+                                            ng-click="resetCamSize(indy * qudratorSize.num_cam_x.length + indx, 'down')"
+                                            type="button"></button>
+
+                                    <button class="quadrator-control quadrator-control_left"
+                                            ng-if="quadratorParams[indy * qudratorSize.num_cam_x.length + indx].buttons.left"
+                                            ng-click="setNewSize(indy * qudratorSize.num_cam_x.length + indx, 'left')"
+                                            type="button"></button>
+
+                                    <button class="quadrator-control quadrator-control_left_revert"
+                                            ng-if="quadratorParams[indy * qudratorSize.num_cam_x.length + indx].toLeft"
+                                            ng-click="resetCamSize(indy * qudratorSize.num_cam_x.length + indx, 'left')"
+                                            type="button"></button>
+
+                                    <button class="quadrator-control quadrator-control_right"
+                                            ng-click="setNewSize(indy * qudratorSize.num_cam_x.length + indx, 'right')"
+                                            ng-if="quadratorParams[indy * qudratorSize.num_cam_x.length + indx].buttons.right"
+                                            type="button"></button>
+
+                                    <button class="quadrator-control quadrator-control_right_revert"
+                                            ng-if="quadratorParams[indy * qudratorSize.num_cam_x.length + indx].toRight"
+                                            ng-click="resetCamSize(indy * qudratorSize.num_cam_x.length + indx, 'right')"
+                                            type="button"></button>
+
                                 </td>
                             </tr>
                         </table>
                     </div>
 
 
-                    <div class="form-field form-field--required form-field--required--select form-field--required--select--fullwidth">
-                        <label>
-                            Соотношение сторон отображения камер <br>
-                            <div ng-select
-                                 ng-model="selectedSize"
-                                 ng-model-list="resolutionsSelect"
-                                 ng-select-options="{class: 'select-3', label: 'size', value: 'values'}">
-                            </div>
-                        </label>
-                    </div>
 
                     <div class="form-field form-field--cam-params">
                         Параметры потока<br>

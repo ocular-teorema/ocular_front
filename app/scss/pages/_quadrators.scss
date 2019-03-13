@@ -1,0 +1,128 @@
+.create-quadrator-table {
+  background: #000;
+  border-color: #333;
+  td {
+    background: no-repeat center center;
+    background-size: contain;
+    position: relative;
+  }
+  .cameras-table-size_img {
+    box-sizing: border-box;
+    border: 1px solid #444;
+    opacity: 0;
+
+  }
+  &__container {
+    position: relative;
+  }
+  .select.select-3 {
+    display: none;
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border: 0 none;
+    width: auto;
+    max-width: initial;
+    border-radius: 0;
+    height: auto;
+    font-size: 12px;
+    padding: 5px 10px;
+    background-color: rgba(255, 255, 255, 0.5);
+    .select-active-area:after {
+      border: 5px solid rgba(199, 199, 199, 0);
+      border-top-color: #fff;
+      margin-top: -2px;
+    }
+  }
+  td:hover {
+    .select.select-3 {
+      display: block
+    }
+    .quadrator-control {
+      display: block;
+    }
+  }
+}
+
+.quadrator-control {
+  display: none;
+  position: absolute;
+  background: rgba(43, 145, 237, 0.89);
+  color: #fff;
+  cursor: pointer;
+  border: 0 none;
+  width: 18px;
+  height: 18px;
+  border-radius: 2px;
+  font-weight: bold;
+  text-align: center;
+  padding: 0;
+  &:after {
+    line-height: 16px;
+    display: block;
+  }
+  &_left, &_right {
+    &, &_revert {
+      top: 50%;
+      width: 25px;
+      &:after {
+        margin-top: -2px;
+      }
+    }
+    & {
+      margin-top: -27px;
+    }
+    &_revert {
+      margin-top: -3px;
+    }
+  }
+
+  &_top, &_bottom {
+    &, &_revert {
+      left: 50%;
+      height: 25px;
+    }
+    & {
+      margin-left: -19px;
+    }
+    &_revert {
+      margin-left: 1px;
+    }
+  }
+
+  &_left, &_left_revert {
+    left: 4px;
+  }
+  &_left, &_right_revert {
+    &:after {
+      content: '←';
+    }
+  }
+  &_right, &_left_revert {
+    &:after {
+      content: '→';
+    }
+  }
+
+  &_right, &_right_revert {
+    right: 4px;
+  }
+
+  &_top, &_bottom_revert {
+    &:after {
+      content: '↑';
+    }
+  }
+  &_top {
+    top: 4px;
+  }
+  &_bottom, &_top_revert {
+    &:after {
+      content: '↓';
+    }
+  }
+  &_bottom, &_bottom_revert {
+    bottom: 30px;
+  }
+}
