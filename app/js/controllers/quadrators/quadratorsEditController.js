@@ -37,40 +37,58 @@ module.controller('quadratorsEditController', function($scope, QuadratorsService
         var oldY = oldValues[1];
         var newY = newValues[1];
 
-        // if (newX < oldX) {
-        //     $scope.currentQuadrator.cameras = $scope.currentQuadrator.cameras.filter(function(camera, index) {
-        //         return (index + 1) % oldX;
-        //     });
-        //     $scope.quadratorParams = $scope.quadratorParams.filter(function(camParam, index) {
-        //         var isHidden = !(index + 1) % oldX;
-        //
-        //         if (camParam.hidden) {
-        //             camParam.parentItem.cols--;
-        //             camParam.parentItem.toRight--;
-        //         }
-        //         return !isHidden;
-        //     });
-        // } else if (newX > oldX) {
-        //     for (var k = 0; k < $scope.qudratorSize.num_cam_y.length; k++) {
-        //         var newIndex = oldX  + $scope.currentQuadrator.num_cam_x * k + k;
-        //         $scope.quadratorParams.splice(newIndex, 0, false);
-        //         iniCameraQuadratorParams(newIndex);
-        //         $scope.currentQuadrator.cameras.splice(newIndex, 0, $scope.camerasList[0]);
-        //     }
-        // } else if (newY < oldY) {
-        //     $scope.currentQuadrator.cameras = $scope.currentQuadrator.cameras.filter(function(camera, index) {
-        //         return index > $scope.qudratorSize.num_cam_x * newY - 1;
-        //     });
-        //     $scope.quadratorParams = $scope.quadratorParams.filter(function(camParam, index) {
-        //         if (camParam.hidden) {
-        //             camParam.parentItem.rows--;
-        //             camParam.parentItem.toBottom--;
-        //         }
-        //         return index > $scope.qudratorSize.num_cam_x * newY - 1;
-        //     });
-        // } else if (newY > oldY) {
-        //
-        // }
+        if (newX < oldX) {
+            var newQuadratorParams = [];
+            $scope.quadratorParams.map(function(camParam, index) {
+                if (!((index + 1) % oldX)) {
+                    if (camParam.hidden) {
+                        camParam.parentItem.cols--;
+                        camParam.parentItem.toRight--;
+                        camParam.parentItem.childs = camParam.parentItem.childs.filter(function(camChild) {
+                            return camChild.params !== camParam;
+                        });
+                        iniDisplayingSizeCamera(camParam.parentItem);
+                    } else if (camParam.toLeft) {
+                        camParam.toLeft--;
+                        camParam.cols--;
+                        camParam.childs = camParam.childs.filter(function(camChild) {
+                            return camChild.params !== newQuadratorParams[index - 1];
+                        });
+                        newQuadratorParams[index - 1] = camParam;
+                        $scope.currentQuadrator.cameras[index - 1] = $scope.currentQuadrator.cameras[index];
+                        console.log(camParam);
+                        iniDisplayingSizeCamera(camParam);
+                    }
+                } else {
+                    newQuadratorParams.push(camParam);
+                }
+            });
+            $scope.quadratorParams = newQuadratorParams;
+            $scope.currentQuadrator.cameras = $scope.currentQuadrator.cameras.filter(function(camera, index) {
+                return (index + 1) % oldX;
+            });
+
+        } else if (newX > oldX) {
+            for (var k = 0; k < $scope.qudratorSize.num_cam_y.length; k++) {
+                var newIndex = oldX  + $scope.currentQuadrator.num_cam_x * k + 1;
+                $scope.currentQuadrator.cameras.splice(newIndex, 0, $scope.camerasList[0]);
+                $scope.quadratorParams.splice(newIndex, 0, false);
+                iniCameraQuadratorParams(newIndex);
+            }
+        } else if (newY < oldY) {
+            $scope.currentQuadrator.cameras = $scope.currentQuadrator.cameras.filter(function(camera, index) {
+                return index > $scope.qudratorSize.num_cam_x * newY - 1;
+            });
+            $scope.quadratorParams = $scope.quadratorParams.filter(function(camParam, index) {
+                if (camParam.hidden) {
+                    camParam.parentItem.rows--;
+                    camParam.parentItem.toBottom--;
+                }
+                return index > $scope.qudratorSize.num_cam_x * newY - 1;
+            });
+        } else if (newY > oldY) {
+
+        }
 
         fixCamerasButtons();
     });
