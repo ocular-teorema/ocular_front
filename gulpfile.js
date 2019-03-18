@@ -8,12 +8,19 @@ var gulp = require('gulp'),
     uglifycss = require('gulp-uglifycss'),
     rev = require('gulp-rev'),
     del = require('del'),
+    ngConfig = require('gulp-ng-config'),
     browserify = require('gulp-browserify'),
     argv = require('yargs').argv;
     rename = require('gulp-rename');
     // autoprefixer = require('gulp-autoprefixer'),
     revReplace = require("gulp-rev-replace");
 
+
+var project = argv['project'] || 'teorema';
+
+
+var fs = require('fs'),
+    config = require('./config.js');
 
 var output = 'app';
 var input = 'dist';
@@ -44,9 +51,19 @@ gulp.task('app:favicon', function() {
 //
 //
 
+/* Project images */
+gulp.task('app:project-images', function() {
+    return gulp.src([
+        path.join(output, 'project-images', project, '**/*')
+    ])
+        .pipe(gulp.dest(path.join(input, 'static', folders['images'], 'project')));
+});
+
 /* Styles images collection */
-gulp.task('app:images', function() {
-    return gulp.src(path.join(output, folders['images'], '**/*'))
+gulp.task('app:images', ['app:project-images'], function() {
+    return gulp.src([
+        path.join(output, folders['images'], '**/*')
+    ])
         .pipe(gulp.dest(path.join(input, 'static', folders['images'])));
 });
 
@@ -112,7 +129,7 @@ gulp.task('app:js', function() {
         path.join(output, folders['js'], 'directives', '**/*'),
         path.join(output, folders['js'], 'plugins', '**/*'),
         path.join(output, folders['js'], 'routes', '**/*'),
-        path.join(output, folders['js'], 'services', '**/*')
+        path.join(output, folders['js'], 'services', '**/*'),
     ])
         .pipe(concat('main.js')).pipe(rev())
         .pipe(gulp.dest(path.join(input, 'static', folders['js'])))
@@ -198,8 +215,23 @@ gulp.task('watcher',function() {
 });
 
 
-
-
+//
+// gulp.task('ng-config', function() {
+//     if (!fs.existsSync(input)) {
+//         fs.mkdirSync(input);
+//     }
+//     fs.writeFileSync(path.join(input, 'config.js'),
+//         JSON.stringify(config[process.env.MODE]));
+//
+//
+//     return gulp.src(path.join(input, 'config.js'))
+//         .pipe(
+//             ngConfig('app', {
+//                 createModule: false
+//             })
+//         )
+//         .pipe(gulp.dest(input))
+// });
 
 gulp.task('default', ['app:media', 'type', 'app:images', 'app:favicon', 'app:fonts', 'app:css-images', 'app:templates', 'app:rev'],
     function() {

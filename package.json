@@ -33,6 +33,7 @@
   },
   "dependencies": {
     "angular-sanitize": "^1.7.5",
+    "gulp-ng-config": "^1.5.1",
     "gulp-rename": "^1.2.3",
     "lodash": "^4.17.5"
   }
