@@ -25,9 +25,16 @@
           </div>
           <div class="form-field form-field--required">
             <label>
-              ip-адрес
+              Внешний ip-адрес
               <br>
               <input ng-model="serverModel.address" class="form-field__input" required type="text">
+            </label>
+          </div>
+          <div class="form-field form-field--required">
+            <label>
+              Локальный ip-адрес
+              <br>
+              <input ng-model="serverModel.local_address" class="form-field__input" required type="text">
             </label>
           </div>
           <div class="form-field form-field--checks">
