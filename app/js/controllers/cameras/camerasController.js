@@ -62,4 +62,35 @@ module.controller('camerasController', function ($scope, Windows, CamerasService
       text: 'Вы действительно хотите удалить камеру "' + camera.name + '"?'
     });
   };
+
+  $scope.exportCameras = () => {
+    const header = ['name', 'camera_group', 'address', 'archive_path', 'storage_life', 'analysis'];
+    const replacer = value => value === null ? '' : value;
+    let csv = $scope.cameras.map(row => {
+      return header.map(fieldName => {
+        return JSON.stringify(
+          fieldName === 'camera_group' ? row[fieldName].name : row[fieldName],
+          replacer()
+        );
+      }).join(',');
+    });
+
+    csv.unshift(header.join(','));
+    csv = csv.join('\r\n');
+    $scope.downloadCameras(csv);
+  }
+
+  $scope.downloadCameras = csv => {
+    const a = document.createElement('a');
+    document.body.appendChild(a);
+    a.style = 'display: none';
+
+    const blob = new Blob([csv], {type: 'text/csv'});
+    const url = window.URL.createObjectURL(blob);
+    a.href = url;
+    a.download = 'camerasList.csv';
+    a.click();
+
+    window.URL.revokeObjectURL(url);
+  }
 })
