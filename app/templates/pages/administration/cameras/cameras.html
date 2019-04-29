@@ -1,7 +1,14 @@
 <section class="main users admin-container profile">
     <div class="container clearfix">
       <h1>Список камер</h1>
-      <a ui-sref="main.administration.cameras.create({organizationId: organizationId})" class="button button--grad">Добавить</a>
+      <div class="buttons-container">
+        <a ui-sref="main.administration.cameras.create({organizationId: organizationId})" class="button button--grad">Добавить</a>
+
+        <div class="buttons-container_right">
+          <a class="button button__arrow button__arrow_down">Экспорт</a>
+          <a class="button button__arrow button__arrow_up">Импорт</a>
+        </div>
+      </div>
       <table ng-init="sortUsers('username')" class="list">
         <thead>
           <tr>
