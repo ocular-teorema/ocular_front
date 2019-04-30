@@ -64,7 +64,7 @@ module.controller('camerasController', function ($scope, Windows, CamerasService
   };
 
   $scope.exportCameras = () => {
-    const header = ['name', 'camera_group', 'address', 'archive_path', 'storage_life', 'analysis'];
+    const header = ['id', 'name', 'camera_group', 'server', 'address', 'archive_path', 'storage_life', 'analysis'];
     const replacer = value => value === null ? '' : value;
     let csv = $scope.cameras.map(row => {
       return header.map(fieldName => {
