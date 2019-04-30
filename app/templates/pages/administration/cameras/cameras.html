@@ -6,7 +6,14 @@
 
         <div class="buttons-container_right">
           <a class="button button__arrow button__arrow_down" ng-click="exportCameras()">Экспорт</a>
-          <a class="button button__arrow button__arrow_up">Импорт</a>
+          <a class="button button__arrow button__arrow_up" ng-click="triggerUploadInput()">Импорт</a>
+
+          <input
+            id="uploadFile"
+            type="file"
+            onchange="angular.element(this).scope().importCameras(this)"
+            style="display: none;"
+          >
         </div>
       </div>
       <table ng-init="sortUsers('username')" class="list">
