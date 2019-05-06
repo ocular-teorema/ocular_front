@@ -101,7 +101,8 @@ module.controller('camerasController', function ($scope, Windows, CamerasService
   $scope.convertCsvToObject = async file => {
     const res = await fetch(window.URL.createObjectURL(file));
     const csv = await res.text();
-    const arr = csv.split('\n'); 
+    const arr = csv.split('\n');
+    if (!arr[arr.length - 1].length) arr.pop();
     const cameras = [];
     const headers = arr[0].split(',');
 
@@ -133,7 +134,17 @@ module.controller('camerasController', function ($scope, Windows, CamerasService
               camera.camera_group = res.data.filter(group => {
                 return group.name === camera.camera_group
               })[0].id;
+
+              if (
+                $scope.cameras
+                  .findIndex(uploadedCamera => uploadedCamera.id == camera.id) === -1
+              ) {
+                CamerasService['createCamera'](camera);
+              } else {
+                CamerasService['updateCamera'](camera);
+              }
             });
+        
           });
       });
   }
