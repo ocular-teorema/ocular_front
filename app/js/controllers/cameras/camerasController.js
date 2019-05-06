@@ -1,5 +1,5 @@
 var module = angular.module('app');
-module.controller('camerasController', function ($scope, Windows, CamerasService, selectedOrganization, camerasList) {
+module.controller('camerasController', function ($scope, Windows, CamerasService, selectedOrganization, camerasList, CameraGroupsService) {
   $scope.cameras = angular.copy(camerasList.data);
   $scope.organizationId = selectedOrganization;
 
@@ -98,26 +98,43 @@ module.controller('camerasController', function ($scope, Windows, CamerasService
     angular.element('#uploadFile').trigger('click');
   }
 
-  $scope.importCameras = ({files: files}) => {
-    fetch(window.URL.createObjectURL(files[0]))
-      .then(res => res.text())
-      .then(csv => {
-        const lines = csv.split('\n');
-        const headers = lines[0].split(',');
-        const result = [];
+  $scope.convertCsvToObject = async file => {
+    const res = await fetch(window.URL.createObjectURL(file));
+    const csv = await res.text();
+    const arr = csv.split('\n'); 
+    const cameras = [];
+    const headers = arr[0].split(',');
 
-        for (let i = 1; i < lines.length; i++) {
-          const obj = {};
-          const currentline = lines[i].split(',');
+    for (let i = 1; i < arr.length; i++) {
+      const data = arr[i].split(',');
+      const obj = {};
 
-          for (let j = 0; j < headers.length; j++) {
-            obj[headers[j]] = currentline[j];
-          }
+      for (let j = 0; j < data.length; j++) {
+        obj[headers[j].trim()] = data[j].trim().replace(/['"]+/g, '');
+      }
 
-          result.push(obj);
-        };
+      cameras.push(obj);
+    }
 
-        console.log(result)
+    return cameras;
+  }
+
+  $scope.uploadCameras = ({files: files}) => {
+    $scope.convertCsvToObject(files[0])
+      .then(data => {
+        let payload = data;
+
+        CameraGroupsService['getList']()
+          .then(res => {
+            payload.forEach(camera => {
+              camera.organization = selectedOrganization;
+              camera.indefinitely = false;
+              camera.compress_level = 1;
+              camera.camera_group = res.data.filter(group => {
+                return group.name === camera.camera_group
+              })[0].id;
+            });
+          });
       });
   }
-})
+});
