@@ -2,6 +2,7 @@ var module = angular.module('app');
 module.controller('camerasController', function ($scope, Windows, CamerasService, selectedOrganization, camerasList, CameraGroupsService) {
   $scope.cameras = angular.copy(camerasList.data);
   $scope.organizationId = selectedOrganization;
+  $scope.isUploading = false;
 
   $scope.tableTitles = [
     {
@@ -124,10 +125,12 @@ module.controller('camerasController', function ($scope, Windows, CamerasService
     $scope.convertCsvToObject(files[0])
       .then(data => {
         let payload = data;
-
+        const promises = [];
+        
         CameraGroupsService['getList']()
           .then(res => {
             payload.forEach(camera => {
+              $scope.isUploading = true;
               camera.organization = selectedOrganization;
               camera.indefinitely = false;
               camera.compress_level = 1;
@@ -139,12 +142,18 @@ module.controller('camerasController', function ($scope, Windows, CamerasService
                 $scope.cameras
                   .findIndex(uploadedCamera => uploadedCamera.id == camera.id) === -1
               ) {
-                CamerasService['createCamera'](camera);
+                promises.push(CamerasService['createCamera'](camera));
               } else {
-                CamerasService['updateCamera'](camera);
+                promises.push(CamerasService['updateCamera'](camera));
               }
             });
-        
+
+            Promise.all(promises)
+              .then(() => {
+                $scope.$apply(() => {
+                  $scope.isUploading = false;
+                });
+              });
           });
       });
   }
