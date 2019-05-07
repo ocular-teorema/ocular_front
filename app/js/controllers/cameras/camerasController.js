@@ -138,13 +138,19 @@ module.controller('camerasController', function ($scope, Windows, CamerasService
                 return group.name === camera.camera_group
               })[0].id;
 
-              if (
-                $scope.cameras
-                  .findIndex(uploadedCamera => uploadedCamera.id == camera.id) === -1
-              ) {
-                promises.push(CamerasService['createCamera'](camera));
+              const cameraIndex = $scope.cameras.findIndex(uploadedCamera => uploadedCamera.id == camera.id) 
+              if (cameraIndex === -1) {
+                promises.push(
+                  CamerasService['createCamera'](camera)
+                    .then(res => $scope.cameras.push(res.data))
+                );
               } else {
-                promises.push(CamerasService['updateCamera'](camera));
+                promises.push(
+                  CamerasService['updateCamera'](camera)
+                    .then(res => {
+                      $scope.cameras[cameraIndex] = res.data;
+                    })
+                );
               }
             });
 
