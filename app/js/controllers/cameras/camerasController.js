@@ -125,6 +125,9 @@ module.controller('camerasController', function ($scope, Windows, CamerasService
     $scope.convertCsvToObject(files[0])
       .then(data => {
         let payload = data;
+        // counters for alerting result in popup
+        let editedCameras = 0;
+        let createdCameras = 0;
         const promises = [];
         
         CameraGroupsService['getList']()
@@ -144,6 +147,7 @@ module.controller('camerasController', function ($scope, Windows, CamerasService
                   CamerasService['createCamera'](camera)
                     .then(res => $scope.cameras.push(res.data))
                 );
+                createdCameras += 1;
               } else {
                 promises.push(
                   CamerasService['updateCamera'](camera)
@@ -151,6 +155,7 @@ module.controller('camerasController', function ($scope, Windows, CamerasService
                       $scope.cameras[cameraIndex] = res.data;
                     })
                 );
+                editedCameras += 1;
               }
             });
 
@@ -158,6 +163,10 @@ module.controller('camerasController', function ($scope, Windows, CamerasService
               .then(() => {
                 $scope.$apply(() => {
                   $scope.isUploading = false;
+                  Windows.alert({
+                    title: 'Камеры успешно обновлены',
+                    text: `Добавлено: ${createdCameras}; Отредактировано: ${editedCameras}`
+                  });
                 });
               });
           });
