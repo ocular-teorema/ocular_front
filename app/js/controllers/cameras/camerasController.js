@@ -128,6 +128,7 @@ module.controller('camerasController', function ($scope, Windows, CamerasService
         // counters for alerting result in popup
         let editedCameras = 0;
         let createdCameras = 0;
+        let errors = 0;
         const promises = [];
         
         CameraGroupsService['getList']()
@@ -145,17 +146,21 @@ module.controller('camerasController', function ($scope, Windows, CamerasService
               if (cameraIndex === -1) {
                 promises.push(
                   CamerasService['createCamera'](camera)
-                    .then(res => $scope.cameras.push(res.data))
+                    .then(res => {
+                      $scope.cameras.push(res.data);
+                      createdCameras += 1;
+                    })
+                    .catch(() => errors += 1)
                 );
-                createdCameras += 1;
               } else {
                 promises.push(
                   CamerasService['updateCamera'](camera)
                     .then(res => {
                       $scope.cameras[cameraIndex] = res.data;
+                      editedCameras += 1;
                     })
+                    .catch(() => errors += 1)
                 );
-                editedCameras += 1;
               }
             });
 
@@ -165,7 +170,7 @@ module.controller('camerasController', function ($scope, Windows, CamerasService
                   $scope.isUploading = false;
                   Windows.alert({
                     title: 'Камеры успешно обновлены',
-                    text: `Добавлено: ${createdCameras}; Отредактировано: ${editedCameras}`
+                    text: `Добавлено: ${createdCameras}; Отредактировано: ${editedCameras}; Ошибок:${errors}`
                   });
                 });
               });
