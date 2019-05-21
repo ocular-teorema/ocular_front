@@ -138,9 +138,15 @@ module.controller('camerasController', function ($scope, Windows, CamerasService
               camera.organization = selectedOrganization;
               camera.indefinitely = false;
               camera.compress_level = 1;
-              camera.camera_group = res.data.filter(group => {
+
+              // filter camera groups from server with csv
+              // if group exists on server => camera.camera_group = id
+              // else => camera.camera_group = name
+              const cameraGroup = res.data.filter(group => {
                 return group.name === camera.camera_group
-              })[0].id;
+              })[0];
+
+              camera.camera_group = cameraGroup ? cameraGroup.id : camera.camera_group;
 
               const cameraIndex = $scope.cameras.findIndex(uploadedCamera => uploadedCamera.id == camera.id) 
               if (cameraIndex === -1) {
