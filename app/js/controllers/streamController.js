@@ -1,5 +1,5 @@
 var module = angular.module('app');
-module.controller('streamController', function(
+module.controller('streamController', function (
     $scope,
     currentUser,
     $rootScope,
@@ -35,16 +35,16 @@ module.controller('streamController', function(
 
 
     var svgSizes;
-    var checkQuadratorSize = function() {
+    var checkQuadratorSize = function () {
         var minRangeResolution = 10;
 
         var currentResolution =
-            ($scope.camerasQuadrator.output_width / $scope.camerasQuadrator.num_cam_x) /  ($scope.camerasQuadrator.output_height / $scope.camerasQuadrator.num_cam_y);
+            ($scope.camerasQuadrator.output_width / $scope.camerasQuadrator.num_cam_x) / ($scope.camerasQuadrator.output_height / $scope.camerasQuadrator.num_cam_y);
 
         $scope.camSize = 100 / $scope.camerasQuadrator.num_cam_x;
 
-        resolutions.forEach(function(resolution) {
-            var newResolution = Math.abs(resolution.values[0]/resolution.values[1] - currentResolution);
+        resolutions.forEach(function (resolution) {
+            var newResolution = Math.abs(resolution.values[0] / resolution.values[1] - currentResolution);
             if (minRangeResolution > newResolution) {
                 minRangeResolution = newResolution;
                 $scope.selectedSize = resolution.size;
@@ -57,13 +57,13 @@ module.controller('streamController', function(
             h: $scope.camerasQuadrator.num_cam_y * sizesOfScreen[1]
         };
         $scope.svgImg = $sce.trustAsHtml('<svg xmlns="http://www.w3.org/2000/svg" ' +
-            'viewBox="0 0 '+ svgSizes['w'] + " " + svgSizes['h'] + '" class="cameras-table-size_img" id="cameras-list-wrapper"></svg>');
-        $timeout(function() {
+            'viewBox="0 0 ' + svgSizes['w'] + " " + svgSizes['h'] + '" class="cameras-table-size_img" id="cameras-list-wrapper"></svg>');
+        $timeout(function () {
             $scope.iniSvgMask();
         });
     };
 
-    $scope.iniSvgMask = function() {
+    $scope.iniSvgMask = function () {
         var svg = jQuery('.img-wrapper .cameras-table-size_img');
         if (!svg.length) return;
         var allContentWrapper = svg.parents('.cameras-table').first();
@@ -85,23 +85,33 @@ module.controller('streamController', function(
 
     var types = ['record-analize', 'motion-analize', 'full-analize'];
 
-    $scope.quadratorsList.map(function(quadrator) {
-        quadrator.full_cameras = quadrator.cameras.map(function(cameraId) {
-            var cameraItem = camerasList.data.filter(function(camera) {
-                return camera.id === cameraId;
+    $scope.quadratorsList.map(function (quadrator) {
+        quadrator.cells = [];
+        for (var i = 0; i < quadrator.num_cam_y; i++) {
+            var row = [];
+            quadrator.cells.push(row);
+            for (var j = 0; j < quadrator.num_cam_x; j++) {
+                row.push({ hidden: true });
+            }
+        }
+        quadrator.cameras.map(function (cameraInQuadrator) {
+            var cell = quadrator.cells[cameraInQuadrator.y][cameraInQuadrator.x];
+            cell.hidden = false;
+            cell.params = cameraInQuadrator;
+            cell.camera = camerasList.data.filter(function (camera) {
+                return camera.id === cameraInQuadrator.camera_id;
             })[0];
-            cameraItem['analysis-icon'] = types[cameraItem.analysis - 1];
-            cameraItem['noReactionEvents'] = [];
-            cameraItem['events'] = [];
-            cameraItem['latestEvents'] = [];
-            return cameraItem;
+            cell.camera['analysis-icon'] = types[cell.camera.analysis - 1];
+            cell.camera['noReactionEvents'] = [];
+            cell.camera['events'] = [];
+            cell.camera['latestEvents'] = [];
         });
     });
 
 
-    var checkLatestEvents = function(camera) {
+    var checkLatestEvents = function (camera) {
         var oldLatestLength = camera.latestEvents.length;
-        camera.latestEvents = camera.events.filter(function(eventData) {
+        camera.latestEvents = camera.events.filter(function (eventData) {
             return $scope.confidence <= eventData.confidence;
         });
 
@@ -110,39 +120,50 @@ module.controller('streamController', function(
         }
     };
 
-    var resetEventsList = function(camerasQuadrator) {
-        camerasQuadrator.full_cameras.map(function(cameraItem) {
-            cameraItem['noReactionEvents'] = [];
-            cameraItem['events'] = [];
-            cameraItem['latestEvents'] = [];
-        });
+    var resetEventsList = function (camerasQuadrator) {
+        if (camerasQuadrator.cells.length) {
+            for (var row = 0; row < camerasQuadrator.num_cam_y; row++)
+                for (var col = 0; col < camerasQuadrator.num_cam_x; col++) {
+                    var cell = camerasQuadrator.cells[row][col];
+                    if (cell.camera) {
+                        cell.camera['noReactionEvents'] = [];
+                        cell.camera['events'] = [];
+                        cell.camera['latestEvents'] = [];
+                    }
+                }
+        }
     };
 
-    $scope.$watch('camerasQuadrator', function(newQu, oldQu) {
+    $scope.$watch('camerasQuadrator', function (newQu, oldQu) {
         checkQuadratorSize();
         $scope.closeSelectedCamera();
         $scope.showVideoContainer = false;
-        $timeout(function() {
+        $timeout(function () {
             $scope.showVideoContainer = true;
         });
 
         resetEventsList(oldQu);
 
-        WebSocketService.subscribe($scope.camerasQuadrator.cameras.filter(function(value, index, self) {
+        WebSocketService.subscribe($scope.camerasQuadrator.cameras.filter(function (value, index, self) {
             return self.indexOf(value) === index;
-        }), function(eventData) {
-            var cameras = $scope.camerasQuadrator.full_cameras.filter(function(cam) {
-                return cam.id == eventData.camera_id;
-            });
+        }), function (eventData) {
+            var cameras = [];
+
+            for (var row = 0; row < $scope.camerasQuadrator.num_cam_y; row++)
+                for (var col = 0; col < $scope.camerasQuadrator.num_cam_x; col++) {
+                    var cell = $scope.camerasQuadrator.cells[row][col];
+                    if (cell.camera && cell.camera.camera_id === eventData.camera_id)
+                        cameras.push(cell.camera);
+                }
 
             if (!cameras.length) return;
 
-            cameras.forEach(function(camera) {
+            cameras.forEach(function (camera) {
                 if (eventData.isStarted) {
                     camera.events.push(eventData);
                 }
                 if (eventData.isFinished) {
-                    camera.events = camera.events.filter(function(event) {
+                    camera.events = camera.events.filter(function (event) {
                         return event.id != eventData.id;
                     });
                     if (eventData.reaction == '-1') {
@@ -161,7 +182,7 @@ module.controller('streamController', function(
     });
 
 
-    $scope.securityReaction = function(reaction, camera) {
+    $scope.securityReaction = function (reaction, camera) {
         if (!camera.events) return;
         WebSocketService.sendReaction({
             reaction: reaction,
@@ -181,7 +202,7 @@ module.controller('streamController', function(
 
     var initedDialog = false;
 
-    $scope.openEvent = function(camera) {
+    $scope.openEvent = function (camera) {
         var event = camera.noReactionEvents.pop();
         var parser = document.createElement('a');
         parser.href = camera.ws_video_url;
@@ -218,7 +239,7 @@ module.controller('streamController', function(
 
 
     /* Управление полноэкранным режимом */
-    var toggleFullScreen = function(open) {
+    var toggleFullScreen = function (open) {
 
         console.log(open);
 
@@ -255,25 +276,25 @@ module.controller('streamController', function(
         }
     };
 
-    $scope.setFullScreenMode = function() {
+    $scope.setFullScreenMode = function () {
         toggleFullScreen(document.webkitFullscreenEnabled || document.fullscreenEnabled);
     };
-    $scope.removeFullScreenMode = function() {
+    $scope.removeFullScreenMode = function () {
         toggleFullScreen(document.webkitFullscreenEnabled || document.fullscreenEnabled);
     };
 
     var Beep = document.getElementById('beep');
 
-    $scope.setSelectedCamera = function(camera) {
+    $scope.setSelectedCamera = function (camera) {
         $scope.selectedCamera = camera;
-        $timeout(function() {
+        $timeout(function () {
             $scope.iniSvgMask();
         });
     };
 
-    $scope.closeSelectedCamera = function() {
+    $scope.closeSelectedCamera = function () {
         $scope.selectedCamera = false;
-        $timeout(function() {
+        $timeout(function () {
             $scope.iniSvgMask();
         });
     };
@@ -284,8 +305,13 @@ module.controller('streamController', function(
         ? localStorage['dangerLavel']
         : 0;
 
-    $scope.onSelectDanger = function(value) {
-        $scope.camerasQuadrator.full_cameras.map(checkLatestEvents);
+    $scope.onSelectDanger = function (value) {
+        for (var row = 0; row < $scope.camerasQuadrator.num_cam_y; row++)
+            for (var col = 0; col < $scope.camerasQuadrator.num_cam_x; col++) {
+                var cell = $scope.camerasQuadrator.cells[row][col];
+                if (cell && cell.camera)
+                    checkLatestEvents(cell.camera);
+            }
         localStorage['dangerLavel'] = JSON.stringify(value);
     };
 
@@ -314,13 +340,13 @@ module.controller('streamController', function(
 
     $scope.date = new Date();
 
-    var getNewTime = function() {
+    var getNewTime = function () {
         $scope.date = new Date(startServerDateTime + (new Date().getTime()) - startLocalDateTime);
     };
 
     var dateTimeInterval = $interval(getNewTime, 200);
 
-    $scope.$on('$destroy', function() {
+    $scope.$on('$destroy', function () {
         $interval.cancel(dateTimeInterval);
     });
 

@@ -114,7 +114,7 @@
       content: '↑';
     }
   }
-  &_top {
+  &_top, &_top_revert {
     top: 4px;
   }
   &_bottom, &_top_revert {

@@ -27,30 +27,39 @@
     </div>
 </div>
 
-<div class="cameras-table" ng-if="!selectedCamera && camerasQuadrator.full_cameras.length">
+<div class="cameras-table" ng-if="!selectedCamera">
     <div class="cameras-table-wrapper">
         <div ng-if="svgImg" ng-bind-html="svgImg" class="img-wrapper"></div>
         <div class="cameras-table__list">
-            <div class="cameras-table__item"
-                 ng-repeat="camera in camerasQuadrator.full_cameras track by $index"
-                 ng-style="{width: camSize + '%'}">
-                <img class="size-img" ng-src="/static/images/{{selectedSize}}.gif">
+	<table>
+        <tbody>
+            <tr ng-style="{ height: camSize + '%'}"
+                ng-repeat="row in camerasQuadrator.cells track by $index">
+		<td     ng-style="{width: camSize + '%'}"
+			ng-repeat="cell in row track by $index" 
+			ng-if="!cell.hidden" 
+			ng-attr-colspan="{{cell.params.cols}}"
+			ng-attr-rowspan="{{cell.params.rows}}">
+                <div class="cameras-table__item">
+                <img class="size-img" 
+			ng-style="{width: 100 / cell.params.cols + '%', height: 100 / cell.params.rows + '%'}" 
+			ng-src="/static/images/{{selectedSize}}.gif">
                 <div class="camera-stream-box"
-                     ng-class="{'camera-alert': camera.latestEvents.length}"
-                     ng-click="setSelectedCamera(camera)">
+                     ng-class="{'camera-alert': cell.camera.latestEvents.length}"
+                     ng-click="setSelectedCamera(cell.camera)">
                     <div class="cameras-categories-container without-arrow">
                 <span class="camera-name">
-                    <span class="camera-name-title with-analize-icon {{camera['analysis-icon']}}">
+                    <span class="camera-name-title with-analize-icon {{cell.camera['analysis-icon']}}">
                         <span class="camera-name-title-text"
-                              title="{{ camera.camera_group.name }} - {{ camera.name }}">
-                            {{ camera.camera_group.name }} - {{ camera.name }}</span>
+                              title="{{ cell.camera.camera_group.name }} - {{ cell.camera.name }}">
+                            {{ cell.camera.camera_group.name }} - {{ cell.camera.name }}</span>
                     </span>
                 </span>
                     </div>
                 </div>
 
                 <div class="camera-event-buttons"
-                     ng-if="camera.latestEvents.length">
+                     ng-if="cell.camera.latestEvents.length">
                     <button class="camera-event-btn" ng-click="securityReaction(1, camera)">
                         запомнить
                         <img src="/static/images/buttons/attention.svg"/>
@@ -62,14 +71,18 @@
                 </div>
 
                 <div class="camera-event-buttons"
-                     ng-if="camera.noReactionEvents.length && !camera.latestEvents.length">
-                    <a href="#" class="camera-event-btn" ng-click="openEvent(camera)">
+                     ng-if="cell.camera.noReactionEvents.length && !cell.camera.latestEvents.length">
+                    <a href="#" class="camera-event-btn" ng-click="openEvent(cell.camera)">
                         пересмотреть
                         <img src="/static/images/buttons/repeat.svg"/>
                     </a>
                 </div>
-            </div>
-        </div>
+                </div>
+		</td>
+            </tr>
+        </tbody>
+	</table>
+	</div>
         <div class="video-stream" style="width: 100%; height: 100%;">
             <video id="quadrator-video-stream"
                    muted="muted"
