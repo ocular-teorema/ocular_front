@@ -70,7 +70,6 @@ angular
 
 
                     cam.thumb_url_record = parser.protocol + '//' + parser.hostname + ':8080/cam' + cam['id'] + '/thumb.jpg';
-                    cam.thumb_url = parser.protocol +'//' + parser.hostname + ':5005/thumb/' + cam['id'] + '/';
 
                     cam.info_url = cam.analysis === 1 ? '' :'http://' + parser.host;
                     // iframe.attr('src', '/video.html?video=' + encodeURIComponent('http://' + parser.hostname +':8080/cam' + camera['id'] + '/alertFragments/alert' + event.id + '.mp4'));

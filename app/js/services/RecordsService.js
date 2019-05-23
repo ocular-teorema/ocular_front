@@ -6,7 +6,7 @@ angular
             getStatistics: function(startDate, endDate, startTime, endTime, camera) {
                 return ServersService.getServer(camera.server).then(function(res) {
                     var deffered = $q.defer();
-                    $http.get('http://' + res.data.address + ':5005/db/startDate='+startDate+'&endDate='+endDate+'&startTime='+startTime+'&endTime='+endTime +'&events=0&cam=cam'+camera.id)
+                    $http.get('http://' + res.data.fact_address + ':5005/db/startDate='+startDate+'&endDate='+endDate+'&startTime='+startTime+'&endTime='+endTime +'&events=0&cam=cam'+camera.id)
                         .then(function(result) {
                             deffered.resolve({
                                 data: result.data,
@@ -21,7 +21,7 @@ angular
             getEvents: function(startDate, endDate, startTime, endTime, camera) {
                 return ServersService.getServer(camera.server).then(function(res) {
                 var deffered = $q.defer();
-                $http.get('http://' + res.data.address + ':5005/archivedb/startDate='+startDate+'&endDate='+endDate+'&startTime='+startTime+'&endTime='+endTime+'&cam=cam'+camera.id)
+                $http.get('http://' + res.data.fact_address + ':5005/archivedb/startDate='+startDate+'&endDate='+endDate+'&startTime='+startTime+'&endTime='+endTime+'&cam=cam'+camera.id)
                     .then(function(result) {
                         deffered.resolve(result.data);
                     }, function(error) {
