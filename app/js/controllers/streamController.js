@@ -91,12 +91,14 @@ module.controller('streamController', function (
             var row = [];
             quadrator.cells.push(row);
             for (var j = 0; j < quadrator.num_cam_x; j++) {
-                row.push({ hidden: true });
+                row.push({ hidden: false, params: { cols: 1, rows: 1 } });
             }
         }
         quadrator.cameras.map(function (cameraInQuadrator) {
             var cell = quadrator.cells[cameraInQuadrator.y][cameraInQuadrator.x];
-            cell.hidden = false;
+            for (var l = 0; l < cell.cols; l++)
+                for (var h = 0; h < cell.rows; h++)
+                    quadrator.cells[cameraInQuadrator.y + h][cameraInQuadrator.x + l].hidden = l !== 0 && h !== 0;
             cell.params = cameraInQuadrator;
             cell.camera = camerasList.data.filter(function (camera) {
                 return camera.id === cameraInQuadrator.camera_id;
