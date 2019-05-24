@@ -13,7 +13,8 @@ module.controller('serversEditController', function($scope, $state, Windows, org
     if (!$scope.serverModel.type) $scope.serverModel.type = 'storage';
   } else {
     $scope.serverModel = {
-      type: 'storage'
+      type: 'storage',
+      local_address: '0.0.0.0'
     }
   }
 
