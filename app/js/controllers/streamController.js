@@ -85,7 +85,7 @@ module.controller('streamController', function (
 
     var types = ['record-analize', 'motion-analize', 'full-analize'];
 
-    $scope.quadratorsList.map(function (quadrator) {
+    $scope.quadratorsList.forEach(function (quadrator) {
         quadrator.cells = [];
         for (var i = 0; i < quadrator.num_cam_y; i++) {
             var row = [];
@@ -94,11 +94,11 @@ module.controller('streamController', function (
                 row.push({ hidden: false, params: { cols: 1, rows: 1 } });
             }
         }
-        quadrator.cameras.map(function (cameraInQuadrator) {
+        quadrator.cameras.forEach(function (cameraInQuadrator) {
             var cell = quadrator.cells[cameraInQuadrator.y][cameraInQuadrator.x];
-            for (var l = 0; l < cell.cols; l++)
-                for (var h = 0; h < cell.rows; h++)
-                    quadrator.cells[cameraInQuadrator.y + h][cameraInQuadrator.x + l].hidden = l !== 0 && h !== 0;
+            for (var l = 0; l < cameraInQuadrator.cols; l++)
+                for (var h = 0; h < cameraInQuadrator.rows; h++)
+                    quadrator.cells[cameraInQuadrator.y + h][cameraInQuadrator.x + l].hidden = l !== 0 || h !== 0;
             cell.params = cameraInQuadrator;
             cell.camera = camerasList.data.filter(function (camera) {
                 return camera.id === cameraInQuadrator.camera_id;
@@ -108,6 +108,7 @@ module.controller('streamController', function (
             cell.camera['events'] = [];
             cell.camera['latestEvents'] = [];
         });
+        console.log('quadrator', quadrator);
     });
 
 
