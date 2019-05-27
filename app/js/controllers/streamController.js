@@ -156,7 +156,7 @@ module.controller('streamController', function (
             for (var row = 0; row < $scope.camerasQuadrator.num_cam_y; row++)
                 for (var col = 0; col < $scope.camerasQuadrator.num_cam_x; col++) {
                     var cell = $scope.camerasQuadrator.cells[row][col];
-                    if (cell.camera && cell.camera.camera_id === eventData.camera_id)
+                    if (cell.camera && cell.camera.id === eventData.camera_id)
                         cameras.push(cell.camera);
                 }
 
