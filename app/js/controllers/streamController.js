@@ -146,9 +146,10 @@ module.controller('streamController', function (
         });
 
         resetEventsList(oldQu);
-
         WebSocketService.subscribe($scope.camerasQuadrator.cameras.filter(function (value, index, self) {
             return self.indexOf(value) === index;
+        }).map(function (cam) {
+            return cam.camera_id;
         }), function (eventData) {
             var cameras = [];
 
