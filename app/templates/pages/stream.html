@@ -59,11 +59,11 @@
 
                                 <div class="camera-event-buttons"
                                      ng-if="cell.camera && cell.camera.latestEvents.length">
-                                    <button class="camera-event-btn" ng-click="securityReaction(1, camera)">
+                                    <button class="camera-event-btn" ng-click="securityReaction(1, cell.camera)">
                                         запомнить
                                         <img src="/static/images/buttons/attention.svg" />
                                     </button>
-                                    <button class="camera-event-btn" ng-click="securityReaction(0, camera)">
+                                    <button class="camera-event-btn" ng-click="securityReaction(0, cell.camera)">
                                         ложно
                                         <img src="/static/images/buttons/skip.svg" />
                                     </button>
