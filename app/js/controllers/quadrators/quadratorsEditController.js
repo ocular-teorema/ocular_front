@@ -579,7 +579,7 @@ module.controller('quadratorsEditController', function ($scope, QuadratorsServic
     $scope.cameraBackground = function (cameraIndex) {
         var params;
         if (cameraIndex < $scope.quadratorParams.length && (params = $scope.quadratorParams[cameraIndex]).camera.id)
-            return 'background-image: url(//' + params.camera.serverModel.address + ':8080/cam' + params.camera.id + '/thumb.jpg)';
+            return 'background-image: url(//' + params.camera.serverModel.fact_address + ':8080/cam' + params.camera.id + '/thumb.jpg)';
         return 'background-image: none; background-color: black;';
     }
 
