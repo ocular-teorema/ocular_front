@@ -118,6 +118,10 @@ module.controller('streamController', function (
             return $scope.confidence <= eventData.confidence;
         });
 
+        camera.noReactionEvents = camera.noReactionEvents.filter(function (eventData) {
+            return $scope.confidence <= eventData.confidence;
+        });
+
         if (oldLatestLength < camera.latestEvents.length) {
             Beep.play();
         }
@@ -170,7 +174,8 @@ module.controller('streamController', function (
                     camera.events = camera.events.filter(function (event) {
                         return event.id != eventData.id;
                     });
-                    if (eventData.reaction == '-1') {
+
+                    if (eventData.reaction == '-1' && $scope.confidence <= eventData.confidence) {
                         camera.noReactionEvents.push(eventData);
                     }
                 }
