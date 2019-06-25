@@ -17,6 +17,7 @@ module.controller('streamController', function (
     var startServerDateTime = new Date(camerasQuadrators.headers('date')).getTime(),
         startLocalDateTime = new Date().getTime();
 
+    var Beep = document.getElementById('beep');
 
     /* Select for output cameras stream resolution */
 
@@ -123,7 +124,16 @@ module.controller('streamController', function (
         });
 
         if (oldLatestLength < camera.latestEvents.length) {
-            Beep.play();
+            try
+            {
+                Beep.play().catch(function (ex) { 
+                    console.log('Unable to play sound: ', ex);
+                });
+            }
+            catch (e)
+            {
+                console.log('Unable to play sound: ', e);
+            }
         }
     };
 
@@ -171,12 +181,17 @@ module.controller('streamController', function (
                     camera.events.push(eventData);
                 }
                 if (eventData.isFinished) {
-                    camera.events = camera.events.filter(function (event) {
-                        return event.id != eventData.id;
-                    });
+                    var event = camera.events.filter(function (event) {
+                        return event.id === eventData.id;
+                    })[0];
+                    if (event) {
+                        camera.events = camera.events.filter(function (event) {
+                            return event.id !== eventData.id;
+                        });
 
-                    if (eventData.reaction == '-1' && $scope.confidence <= eventData.confidence) {
-                        camera.noReactionEvents.push(eventData);
+                        if (eventData.reaction == '-1' && $scope.confidence <= eventData.confidence) {
+                            camera.noReactionEvents.push(eventData);
+                        }
                     }
                 }
 
@@ -291,8 +306,6 @@ module.controller('streamController', function (
     $scope.removeFullScreenMode = function () {
         toggleFullScreen(document.webkitFullscreenEnabled || document.fullscreenEnabled);
     };
-
-    var Beep = document.getElementById('beep');
 
     $scope.setSelectedCamera = function (camera) {
         $scope.selectedCamera = camera;
