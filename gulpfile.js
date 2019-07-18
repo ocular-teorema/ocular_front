@@ -45,7 +45,7 @@ var folders = {
 //
 /* Favicon */
 gulp.task('app:favicon', function() {
-    return gulp.src(path.join(output, folders['favicon'], '**/*'))
+    return gulp.src(path.join(output, folders['favicon'], project, '**/*'))
         .pipe(gulp.dest(path.join(input, 'static', folders['favicon'])));
 });
 //
