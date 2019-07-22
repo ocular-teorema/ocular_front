@@ -14,10 +14,10 @@ var gulp = require('gulp'),
     rename = require('gulp-rename');
     // autoprefixer = require('gulp-autoprefixer'),
     revReplace = require("gulp-rev-replace");
+    htmlreplace = require("gulp-html-replace");
 
 
 var project = argv['project'] || 'teorema';
-
 
 var fs = require('fs'),
     config = require('./config.js');
@@ -40,6 +40,10 @@ var folders = {
     'static': 'static',
     'bower': 'bower_components',
     'i18n': 'i18n'
+};
+
+var titles = {
+    'stalt': 'stalt-video'
 };
 
 //
@@ -190,6 +194,7 @@ gulp.task('app:revision', function() {
         .pipe(revReplace({manifest: manifestCSS}))
         .pipe(revReplace({manifest: manifestJS}))
         .pipe(revReplace({manifest: manifestLoginJS}))
+        .pipe(htmlreplace({title: '<title>' + (titles[project] || 'Ocular') + '</title>'}))
         .pipe(gulp.dest(input))
 });
 
