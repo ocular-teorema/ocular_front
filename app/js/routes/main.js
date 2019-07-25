@@ -489,4 +489,14 @@ module.config(function ($stateProvider, $locationProvider, $urlRouterProvider) {
                 }
             }
         })
+        .state('activeCamera', {
+            url: '/active-camera',
+            templateUrl: templatesPath + 'pages/active-camera.html',
+            controller: 'activeCameraController',
+            resolve: {
+                camerasList: function (CamerasService) {
+                    return CamerasService.getList();
+                }
+            }
+        })
 });

@@ -372,4 +372,8 @@ module.controller('streamController', function (
         $interval.cancel(dateTimeInterval);
     });
 
+    $scope.openActiveCamera = function ($event) {
+	window.open('/active-camera', 'newwindow', 'menubar=no,location=no,resizable=yes,scrollbars=no,status=yes'); 
+        $event.preventDefault();
+    };
 });
