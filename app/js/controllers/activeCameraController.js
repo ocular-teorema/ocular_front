@@ -20,7 +20,7 @@ module.controller('activeCameraController', function($scope, camerasList) {
         if (cameraId) {
             var camera = camerasList.data.filter(function (c) { return c.id === cameraId; })[0];
             if (camera) {
-                $scipe.ws_video_url = camera.ws_video_url;
+                $scope.ws_video_url = camera.ws_video_url;
             }
         }
     }
