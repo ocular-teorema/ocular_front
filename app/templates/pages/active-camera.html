@@ -2,6 +2,9 @@
     <div class="video-stream">
         <video id="quadrator-video-stream"
                muted="muted"
-               ng-if="showVideoContainer" ng-mse-player="{stream: ws_video_url}"></video>
+               ng-if="ws_video_url"
+               ng-mse-player="{stream: ws_video_url}"></video>
     </div>
+    <p style="display:none">{{ws_video_url}}</p>
+    <button style="display:none" ng-click="test()">Test</button>
 </div>

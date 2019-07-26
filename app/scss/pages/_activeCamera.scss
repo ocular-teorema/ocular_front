@@ -4,7 +4,12 @@
   background-color: black;
 }
 
-.video-stream {
+.active-camera-container .video-stream {
+  width: 100vw;
+  height: 100vh;
+}
+
+.active-camera-container .video-stream #quadrator-video-stream {
   width: 100vw;
   height: 100vh;
 }
