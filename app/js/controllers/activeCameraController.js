@@ -23,7 +23,7 @@ module.controller('activeCameraController', function($scope, camerasList) {
             if (camera) {
                 $scope.ws_video_url = camera.ws_video_url;
                 console.log('Url:', $scope.ws_video_url);
-                $scope.apply();
+                $scope.$apply();
             }
         }
     }
