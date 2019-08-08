@@ -1,5 +1,5 @@
 var module = angular.module('app');
-module.controller('usersEditController', function ($scope, $state, $timeout, $rootScope, selectedUser, currentUser, selectedUser, organizationsList, UsersService, cameraGroupsList, camerasList, Windows) {
+module.controller('usersEditController', function ($scope, $state, $timeout, $rootScope, selectedUser, currentUser, selectedUser, organizationsList, UsersService, cameraGroupsList, camerasList, quadratorsList, Windows) {
 
   $scope.organizationsList = organizationsList.data
   
@@ -161,6 +161,85 @@ module.controller('usersEditController', function ($scope, $state, $timeout, $ro
     checkCamerasList();
   }
 
+  // Квадраторы
+  $scope.quadratorsList = angular.copy(quadratorsList.data);
+  var setUndefinedQuadratorOption = function () {
+    $scope.quadratorsList.unshift({
+      id: 0,
+      information: true,
+      name: 'Выберите квадратор'
+    });
+  };
+
+  $scope.quadratorsSelectOptions = {
+    class: 'hidden-select select-3',
+    label: 'name',
+    value: 'id',
+    showed: false
+  };
+
+  var onCheckQuadratorsList = false;
+  var checkQuadratorsListAfterSelect = function () {
+    onCheckQuadratorsList = true;
+    $scope.quadratorsList = accessQuadrators.filter(function (q) {
+      return !$scope.selectedQuadrators.filter(function (selectedQuadrator) {
+        return selectedQuadrator.id === q.id;
+      }).length
+    });
+    setUndefinedQuadratorOption();
+    $timeout(function () {
+      onCheckQuadratorsList = false;
+    });
+  };
+
+  $scope.onSelectQuadrator = function (quadrator) {
+    if (onCheckQuadratorsList) return;
+    $scope.selectedQuadrators.push($scope.quadratorsList.filter(function (q) {
+      return q.id === quadrator;
+    })[0]);
+    checkQuadratorsListAfterSelect();
+  };
+
+  $scope.removeQuadrator = function (quadrator) {
+    $scope.selectedQuadrators = $scope.selectedQuadrators.filter(function (q) {
+      return q !== quadrator;
+    });
+    checkQuadratorsListAfterSelect();
+  };
+
+  $scope.selectedQuadrators = [];
+  var accessQuadrators = [];
+  var checkQuadratorsList = function () {
+    onCheckQuadratorsList = true;
+    accessQuadrators = angular.copy(quadratorsList.data);
+    $scope.quadratorsList = angular.copy(accessQuadrators);
+    setUndefinedQuadratorOption();
+    $scope.selectedQuadrators = $scope.selectedQuadrators.filter(function (selectedQuadrator) {
+      return accessQuadrators.filter(function (accessQuadrator) {
+        return selectedQuadrator.id === accessQuadrator.id;
+      }).length;
+    });
+    checkQuadratorsListAfterSelect();
+    $timeout(function () {
+      onCheckQuadratorsList = false;
+    });
+  };
+
+  debugger;
+  if ($scope.userModel.quadrator_access) {
+    var selectedQuadrators = [];
+    $scope.userModel.quadrator_access.map(function (quadratorId) {
+      selectedQuadrators = selectedQuadrators.concat(quadratorsList.data.filter(function (quadrator) {
+        return quadrator.id === quadratorId;
+      }));
+    });
+    $scope.selectedQuadrators = angular.copy(selectedQuadrators);
+    checkQuadratorsList();
+  } else {
+    checkQuadratorsList();
+  }
+
+
   $scope.deleteUser = function () {
     if (!$scope.userModel.id) return;
     Windows.confirm({
@@ -196,10 +275,15 @@ module.controller('usersEditController', function ($scope, $state, $timeout, $ro
       });
     });
 
+    var userQuadratorsAccess = [];
 
+    $scope.selectedQuadrators.map(function (quadrator) {
+      userQuadratorsAccess.push(quadrator.id);
+    });
 
     var request = angular.copy($scope.userModel);
     request.cameras_access = userCamerasAccess;
+    request.quadrator_access = userQuadratorsAccess;
     UsersService.saveUser(request).then(function (response) {
       if (!request.id) {
         var user = response.data;

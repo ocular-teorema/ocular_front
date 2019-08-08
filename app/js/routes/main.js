@@ -172,6 +172,9 @@ module.config(function ($stateProvider, $locationProvider, $urlRouterProvider) {
                 },
                 camerasList: function (CamerasService, $stateParams) {
                     return CamerasService.getList($stateParams.organizationId);
+                },
+                quadratorsList: function (QuadratorsService) {
+                    return QuadratorsService.getList();
                 }
             }
         })
@@ -192,6 +195,9 @@ module.config(function ($stateProvider, $locationProvider, $urlRouterProvider) {
                 },
                 camerasList: function (CamerasService, $stateParams) {
                     return CamerasService.getList($stateParams.organizationId);
+                },
+                quadratorsList: function (QuadratorsService) {
+                    return QuadratorsService.getList();
                 }
             }
         })

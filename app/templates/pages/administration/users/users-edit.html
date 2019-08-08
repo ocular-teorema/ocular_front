@@ -94,6 +94,33 @@
                    ng-select-options="camerasSelectOptions"
                    ng-model="cameras_list"></div>
           </div>
+
+          <div class="form-field">
+              <span class="form-control-label">Квадраторы:</span>
+              <div class="text-field text-field--camera for-items-container">
+                  <span class="text-field-selected-item" ng-if="!selectedQuadrators.length && (quadratorsList.length <= 1)">
+                      <span class="no-limit-width">Нет доступных квадраторов для выбора&nbsp;&nbsp;</span>
+                  </span>
+                  <span class="text-field-selected-item" ng-repeat="quadrator in selectedQuadrators">
+                      <span>{{ quadrator.name }}</span>
+                      <i class="icon-delete" ng-click="removeQuadrator(quadrator)">+</i>
+                  </span><span
+                      ng-init="quadratorsSelectOptions.showed = false;"
+                      ng-mousedown="hidden = !quadratorsSelectOptions.showed"
+                      ng-click="quadratorsSelectOptions.showed = hidden;"
+                      ng-if="quadratorsList.length > 1"
+                      class="text-field-selected-item add-btn">
+                      <i class="icon-plus">+</i>
+                  </span>
+              </div>
+              <div ng-select
+                   ng-if="quadratorsList.length > 1"
+                   ng-select-change="onSelectQuadrator"
+                   ng-model-list="quadratorsList"
+                   ng-select-options="quadratorsSelectOptions"
+                   ng-model="quadrators_list"></div>
+          </div>
+
           <!-- <div class="form-field form-field--required">
             <label>
               эл. почта для восстановления пароля
