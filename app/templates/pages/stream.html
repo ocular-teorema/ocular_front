@@ -36,10 +36,10 @@
         <div class="cameras-table__list">
             <table>
                 <tbody>
-                    <tr style="display: none;"><td ng-repeat="cell in camerasQuadrator.cells[0] track by $index" ng-style="{ width: camSize + '%'}"></td></tr>
-                    <tr ng-style="{ 'height': cell.params.rows * camSize + '%'}"
+                    <tr style="display: none;"><td ng-repeat="cell in camerasQuadrator.cells[0] track by $index" ng-style="{ width: camSizeX + '%'}"></td></tr>
+                    <tr ng-style="{ 'height': cell.params.rows * camSizeY + '%'}"
                         ng-repeat="row in camerasQuadrator.cells track by $index">
-                        <td ng-style="{ 'width': cell.params.cols * camSize + '%', 'height': cell.params.rows * camSize + '%'}"
+                        <td ng-style="{ 'width': cell.params.cols * camSizeX + '%', 'height': cell.params.rows * camSizeY + '%'}"
                             ng-repeat="cell in row track by $index"
                             ng-if="!cell.hidden"
                             ng-attr-colspan="{{cell.params.cols}}"

@@ -42,7 +42,8 @@ module.controller('streamController', function (
         var currentResolution =
             ($scope.camerasQuadrator.output_width / $scope.camerasQuadrator.num_cam_x) / ($scope.camerasQuadrator.output_height / $scope.camerasQuadrator.num_cam_y);
 
-        $scope.camSize = 100 / $scope.camerasQuadrator.num_cam_x;
+        $scope.camSizeX = 100 / $scope.camerasQuadrator.num_cam_x;
+        $scope.camSizeY = 100 / $scope.camerasQuadrator.num_cam_y;
 
         resolutions.forEach(function (resolution) {
             var newResolution = Math.abs(resolution.values[0] / resolution.values[1] - currentResolution);
