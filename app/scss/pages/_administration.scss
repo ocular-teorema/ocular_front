@@ -25,6 +25,7 @@ h1 {
     }
     &__form {
       .form-field__input {
+        box-sizing: unset;
         width: 493px;
       }
     }

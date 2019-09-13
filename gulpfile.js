@@ -10,11 +10,12 @@ var gulp = require('gulp'),
     del = require('del'),
     ngConfig = require('gulp-ng-config'),
     browserify = require('gulp-browserify'),
-    argv = require('yargs').argv;
-    rename = require('gulp-rename');
+    argv = require('yargs').argv,
+    rename = require('gulp-rename'),
     // autoprefixer = require('gulp-autoprefixer'),
-    revReplace = require("gulp-rev-replace");
-    htmlreplace = require("gulp-html-replace");
+    revReplace = require("gulp-rev-replace"),
+    htmlreplace = require("gulp-html-replace"),
+    merge = require('merge-stream');
 
 
 var project = argv['project'] || 'teorema';
@@ -73,8 +74,11 @@ gulp.task('app:images', ['app:project-images'], function() {
 
 /* Fonts collection */
 gulp.task('app:fonts', function() {
-    return gulp.src(path.join(output, folders['scss'], 'fonts', '**/*'))
-        .pipe(gulp.dest(path.join(input, 'static', folders['css'], folders['fonts'])));
+    var libFonts = gulp.src(path.join(folders['npm'], 'bootstrap', 'fonts', '*'))
+	.pipe(gulp.dest(path.join(input, 'static', 'fonts')));
+    var cssFonts = gulp.src(path.join(output, folders['scss'], 'fonts', '**/*'))
+	.pipe(gulp.dest(path.join(input, 'static', folders['css'], folders['fonts'])));
+    return merge(libFonts, cssFonts);
 });
 //
 /* Media collection */
@@ -91,14 +95,18 @@ gulp.task('app:templates', function () {
 
 /* Styles collection */
 gulp.task('app:css', function() {
-    del([path.join(input, 'static', folders['css'], '**/*.css')]);
+    del([ path.join(input, 'static', folders['css'], '**/*.css') ]);
     var css = gulp.src(path.join(output, folders['scss'], '*.scss'))
         .pipe(sass());
         // .pipe(autoprefixer());
+    var libCss = gulp.src([
+        path.join(folders['npm'], 'bootstrap', 'dist', 'css', 'bootstrap.min.css'),
+        path.join(folders['npm'], 'angularjs-bootstrap-datetimepicker', 'src', 'css', 'datetimepicker.css')
+    ]).pipe(concat('lib-css.css'));
     if (isProduction) {
         css.pipe(uglifycss());
     }
-    return css.pipe(rev())
+    return merge(css.pipe(rev()), libCss)
         .pipe(gulp.dest(path.join(input, 'static', folders['css'])))
         .pipe(rev.manifest())
         .pipe(gulp.dest(path.join(input, 'static', folders['css'])));
@@ -127,6 +135,10 @@ gulp.task('app:js', function() {
         path.join(folders['npm'], 'jquery.inputmask', 'dist', 'jquery.inputmask.bundle.js'),
         path.join(folders['npm'], 'angular-ui-router', 'release', 'angular-ui-router.min.js'),
         path.join(folders['npm'], 'lodash', 'lodash.min.js'),
+        path.join(folders['npm'], 'moment', 'moment.js'),
+        path.join(folders['npm'], 'bootstrap', 'dist', 'js', 'bootstrap.js'),
+        path.join(folders['npm'], 'angularjs-bootstrap-datetimepicker', 'src', 'js', 'datetimepicker.js'),
+        path.join(folders['npm'], 'angularjs-bootstrap-datetimepicker', 'src', 'js', 'datetimepicker.templates.js'),
         path.join(output, folders['js'], 'main.js'),
         path.join(output, folders['js'], 'constants', '**/*'),
         path.join(output, folders['js'], 'controllers', '**/*'),

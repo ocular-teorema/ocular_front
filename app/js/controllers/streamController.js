@@ -39,11 +39,12 @@ module.controller('streamController', function (
     var checkQuadratorSize = function () {
         var minRangeResolution = 10;
 
-        var currentResolution =
-            ($scope.camerasQuadrator.output_width / $scope.camerasQuadrator.num_cam_x) / ($scope.camerasQuadrator.output_height / $scope.camerasQuadrator.num_cam_y);
+        var currentResolution = $scope.camerasQuadrator
+            ? $scope.camerasQuadrator.output_width / $scope.camerasQuadrator.num_cam_x / ($scope.camerasQuadrator.output_height / $scope.camerasQuadrator.num_cam_y)
+            : 1;
 
-        $scope.camSizeX = 100 / $scope.camerasQuadrator.num_cam_x;
-        $scope.camSizeY = 100 / $scope.camerasQuadrator.num_cam_y;
+        $scope.camSizeX = $scope.camerasQuadrator ? 100 / $scope.camerasQuadrator.num_cam_x : 100;
+        $scope.camSizeY = $scope.camerasQuadrator ? 100 / $scope.camerasQuadrator.num_cam_y : 100;
 
         resolutions.forEach(function (resolution) {
             var newResolution = Math.abs(resolution.values[0] / resolution.values[1] - currentResolution);
@@ -55,8 +56,8 @@ module.controller('streamController', function (
 
         var sizesOfScreen = $scope.selectedSize.split('x');
         svgSizes = {
-            w: $scope.camerasQuadrator.num_cam_x * sizesOfScreen[0],
-            h: $scope.camerasQuadrator.num_cam_y * sizesOfScreen[1]
+            w: ($scope.camerasQuadrator ? $scope.camerasQuadrator.num_cam_x : 1) * sizesOfScreen[0],
+            h: ($scope.camerasQuadrator ? $scope.camerasQuadrator.num_cam_y : 1) * sizesOfScreen[1]
         };
         $scope.svgImg = $sce.trustAsHtml('<svg xmlns="http://www.w3.org/2000/svg" ' +
             'viewBox="0 0 ' + svgSizes['w'] + " " + svgSizes['h'] + '" class="cameras-table-size_img" id="cameras-list-wrapper"></svg>');
@@ -70,7 +71,7 @@ module.controller('streamController', function (
         if (!svg.length) return;
         var allContentWrapper = svg.parents('.cameras-table').first();
 
-        if ((allContentWrapper.width() / svgSizes.w) > (allContentWrapper.height() / svgSizes.h)) {
+        if (allContentWrapper.width() / svgSizes.w > allContentWrapper.height() / svgSizes.h) {
             svg.css({
                 width: 'auto',
                 height: allContentWrapper.height()
@@ -125,21 +126,19 @@ module.controller('streamController', function (
         });
 
         if (oldLatestLength < camera.latestEvents.length) {
-            try
-            {
-                Beep.play().catch(function (ex) { 
+            try {
+                Beep.play().catch(function (ex) {
                     console.log('Unable to play sound: ', ex);
                 });
             }
-            catch (e)
-            {
+            catch (e) {
                 console.log('Unable to play sound: ', e);
             }
         }
     };
 
     var resetEventsList = function (camerasQuadrator) {
-        if (camerasQuadrator.cells.length) {
+        if (camerasQuadrator && camerasQuadrator.cells && camerasQuadrator.cells.length) {
             for (var row = 0; row < camerasQuadrator.num_cam_y; row++)
                 for (var col = 0; col < camerasQuadrator.num_cam_x; col++) {
                     var cell = camerasQuadrator.cells[row][col];
@@ -161,49 +160,53 @@ module.controller('streamController', function (
         });
 
         resetEventsList(oldQu);
-        WebSocketService.subscribe($scope.camerasQuadrator.cameras.filter(function (value, index, self) {
-            return self.indexOf(value) === index;
-        }).map(function (cam) {
-            return cam.camera_id;
-        }), function (eventData) {
-            var cameras = [];
+        if ($scope.camerasQuadrator) {
+            WebSocketService.subscribe($scope.camerasQuadrator.cameras.filter(function (value, index, self) {
+                return self.indexOf(value) === index;
+            }).map(function (cam) {
+                return cam.camera_id;
+            }), function (eventData) {
 
-            for (var row = 0; row < $scope.camerasQuadrator.num_cam_y; row++)
-                for (var col = 0; col < $scope.camerasQuadrator.num_cam_x; col++) {
-                    var cell = $scope.camerasQuadrator.cells[row][col];
-                    if (cell.camera && cell.camera.id === eventData.camera_id)
-                        cameras.push(cell.camera);
-                }
+                if ($scope.camerasQuadrator)
+                    return;
+                var cameras = [];
 
-            if (!cameras.length) return;
+                for (var row = 0; row < $scope.camerasQuadrator.num_cam_y; row++)
+                    for (var col = 0; col < $scope.camerasQuadrator.num_cam_x; col++) {
+                        var cell = $scope.camerasQuadrator.cells[row][col];
+                        if (cell.camera && cell.camera.id === eventData.camera_id)
+                            cameras.push(cell.camera);
+                    }
 
-            cameras.forEach(function (camera) {
-                if (eventData.isStarted) {
-                    camera.events.push(eventData);
-                }
-                if (eventData.isFinished) {
-                    var event = camera.events.filter(function (event) {
-                        return event.id === eventData.id;
-                    })[0];
-                    if (event) {
-                        camera.events = camera.events.filter(function (event) {
-                            return event.id !== eventData.id;
-                        });
+                if (!cameras.length) return;
 
-                        if (eventData.reaction == '-1' && $scope.confidence <= eventData.confidence) {
-                            camera.noReactionEvents.push(eventData);
+                cameras.forEach(function (camera) {
+                    if (eventData.isStarted) {
+                        camera.events.push(eventData);
+                    }
+                    if (eventData.isFinished) {
+                        var event = camera.events.filter(function (event) {
+                            return event.id === eventData.id;
+                        })[0];
+                        if (event) {
+                            camera.events = camera.events.filter(function (event) {
+                                return event.id !== eventData.id;
+                            });
+
+                            if (eventData.reaction === '-1' && $scope.confidence <= eventData.confidence) {
+                                camera.noReactionEvents.push(eventData);
+                            }
                         }
                     }
-                }
 
-                checkLatestEvents(camera);
+                    checkLatestEvents(camera);
 
-                if (camera) {
-                    camera.withWarning = true;
-                }
+                    if (camera) {
+                        camera.withWarning = true;
+                    }
+                });
             });
-        });
-
+        }
     });
 
 
@@ -271,13 +274,13 @@ module.controller('streamController', function (
         var elem = document.body;
 
         if (open &&
-            ((document.fullScreenElement !== undefined &&
-                document.fullScreenElement === null) ||
-                (document.msFullscreenElement !== undefined &&
-                    document.msFullscreenElement === null) ||
-                (document.mozFullScreen !== undefined && !document.mozFullScreen) ||
-                (document.webkitIsFullScreen !== undefined &&
-                    !document.webkitIsFullScreen))
+            (document.fullScreenElement !== undefined &&
+                document.fullScreenElement === null ||
+                document.msFullscreenElement !== undefined &&
+                    document.msFullscreenElement === null ||
+                document.mozFullScreen !== undefined && !document.mozFullScreen ||
+                document.webkitIsFullScreen !== undefined &&
+                    !document.webkitIsFullScreen)
         ) {
             if (elem.requestFullScreen) {
                 elem.requestFullScreen();
@@ -364,7 +367,7 @@ module.controller('streamController', function (
     $scope.date = new Date();
 
     var getNewTime = function () {
-        $scope.date = new Date(startServerDateTime + (new Date().getTime()) - startLocalDateTime);
+        $scope.date = new Date(startServerDateTime + new Date().getTime() - startLocalDateTime);
     };
 
     var dateTimeInterval = $interval(getNewTime, 200);
@@ -374,7 +377,7 @@ module.controller('streamController', function (
     });
 
     $scope.openActiveCamera = function ($event) {
-	window.open('/active-camera', 'newwindow', 'menubar=no,location=no,resizable=yes,scrollbars=no,status=yes'); 
+        window.open('/active-camera', 'newwindow', 'menubar=no,location=no,resizable=yes,scrollbars=no,status=yes');
         $event.preventDefault();
     };
 });

@@ -95,6 +95,27 @@ module.config(function ($stateProvider, $locationProvider, $urlRouterProvider) {
             templateUrl: templatesPath + 'pages/records/player.html',
             controller: 'recordsPlayerController'
         })
+        .state('main.base.archive', {
+            url: '/archive',
+            templateUrl: templatesPath + 'pages/archive.html',
+            controller: 'archiveController',
+            userCameras: function (CamerasService, $q, currentUser, $state) {
+                if (!currentUser) {
+                    $state.go('login');
+                    return;
+                }
+                var defer = $q.defer();
+                CamerasService.getUserCamerasList().then(
+                    function (response) {
+                        defer.resolve(response);
+                    },
+                    function () {
+                        defer.resolve(false);
+                    }
+                );
+                return defer.promise;
+            }
+        })
         .state('main.base.settings', {
             url: '/settings',
             templateUrl: templatesPath + 'pages/settings.html',

@@ -1,5 +1,5 @@
 <div class="stream-panel">
-    <div class="stream-panel__part">
+    <div ng-if="quadratorsList.length" class="stream-panel__part">
         <div ng-select
              style="min-width: 250px;"
              ng-model="camerasQuadrator"
@@ -19,6 +19,7 @@
             <a class="button active-camera-button" href="/active-camera" ng-click="openActiveCamera($event)">Активная камера</a>
         </div>
     </div>
+    <div ng-if="!quadratorsList.length" class="stream-panel__part">Нет доступных квадраторов</div>
     <div class="stream-panel__part">
         <!--<div class="stream-panel__item">-->
         <!--<img ng-click="setFullScreenMode()" src="/static/images/304.svg">-->
@@ -30,7 +31,7 @@
     </div>
 </div>
 
-<div class="cameras-table" ng-if="!selectedCamera">
+<div class="cameras-table" ng-if="!selectedCamera && camerasQuadrator">
     <div class="cameras-table-wrapper">
         <div ng-if="svgImg" ng-bind-html="svgImg" class="img-wrapper"></div>
         <div class="cameras-table__list">

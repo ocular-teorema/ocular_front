@@ -355,22 +355,23 @@
       margin: 0 5px;
     }
   }
+}
   .camera-choose-box {
     &--group {
       margin-right: 10px;
-      label {
+      label.select.select-3 {
         padding-left: 40px;
         background: #fff url('../images/group_camera.svg') no-repeat 5px;
       }
     }
     &--camera {
-      label {
+      label.select.select-3 {
         padding-left: 40px;
         background: #fff url('../images/camera.svg') no-repeat 5px;      
       }
     }
   }
-}
+
 .toggler {
   border: 1px solid #2b91ed;
   background: #fff;
