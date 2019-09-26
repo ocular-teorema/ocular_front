@@ -20,83 +20,86 @@
 <section class="main archive-container" ng-class="{'in-loading': sendForm}">
     <div>
         <div class="slider-camera-tools" ng-if="isCameraFilterShow">
-            <div class="camera-container" ng-repeat="selectedCameraRef in selectedCameras">
-                <div class="toolbox-fieldset" ng-if="!userCameras.groups.length">Нет доступных камер</div>
+            <div>
+                <div class="camera-container" ng-repeat="selectedCameraRef in selectedCameras">
+                    <div class="toolbox-fieldset" ng-if="!userCameras.groups.length">Нет доступных камер</div>
+                    <div class="toolbox-fieldset" ng-if="userCameras.groups.length > 0">
+                        <a ng-if="selectedCameras.length > 1"
+                           ng-click="deleteCamera($index)"
+                           class="camera-delete" href="" title="Убрать камеру">
+                            <img src="/static/images/buttons/del.svg" alt="Убрать камеру">
+                        </a>
+                        <label>Группа камер</label>
+                        <fieldset>
+                            <div class="camera-choose-box camera-choose-box--group">
+                                <div ng-select
+                                     ng-model-list="userCameras.groups"
+                                     ng-select-options="{class: 'select-3', label: 'name'}"
+                                     ng-model="selectedCameraRef.group"></div>
+                            </div>
+                        </fieldset>
+                        <label>Выбрать камеру</label>
+                        <fieldset ng-if="selectedCameraRef.group">
+                            <div ng-if="selectedCameraRef.group.cameras.length > 0" class="camera-choose-box camera-choose-box--camera">
+                                <div ng-select
+                                     ng-select-change="setCameraModel"
+                                     ng-select-change-data="selectedCameraRef"
+                                     ng-model-list="selectedCameraRef.group.cameras"
+                                     ng-select-options="{class: 'select-3', label: 'name'}"
+                                     ng-model="selectedCameraRef.camera"></div>
+                            </div>
+                            <div class="panel-info" ng-if="camerasGroup.cameras.length <= 0">
+                                В данной группе нет доступных камер
+                            </div>
+                        </fieldset>
+                    </div>
+                </div>
+
+                <!--Дата-->
                 <div class="toolbox-fieldset" ng-if="userCameras.groups.length > 0">
-                    <a ng-if="selectedCameras.length > 1"
-                       ng-click="deleteCamera($index)"
-                       class="camera-delete" href="" title="Убрать камеру">
-                        <img src="/static/images/buttons/del.svg" alt="Убрать камеру">
-                    </a>
-                    <label>Группа камер</label>
+                    <label>Дата и время с</label>
                     <fieldset>
-                        <div class="camera-choose-box camera-choose-box--group">
-                            <div ng-select
-                                 ng-model-list="userCameras.groups"
-                                 ng-select-options="{class: 'select-3', label: 'name'}"
-                                 ng-model="selectedCameraRef.group"></div>
-                        </div>
-                    </fieldset>
-                    <label>Выбрать камеру</label>
-                    <fieldset ng-if="selectedCameraRef.group">
-                        <div ng-if="selectedCameraRef.group.cameras.length > 0" class="camera-choose-box camera-choose-box--camera">
-                            <div ng-select
-                                 ng-select-change="setCameraModel"
-                                 ng-model-list="selectedCameraRef.group.cameras"
-                                 ng-select-options="{class: 'select-3', label: 'name'}"
-                                 ng-model="selectedCameraRef.camera"></div>
-                        </div>
-                        <div class="panel-info" ng-if="camerasGroup.cameras.length <= 0">
-                            В данной группе нет доступных камер
+                        <div class="dropdown dropdown-start-date">
+                            <a class="dropdown-toggle" id="startDateDropdown" role="button" data-toggle="dropdown" data-target=".dropdown-start-date" href="#">
+                                <div class="input-group">
+                                    <input type="text" id="startDate" name="startDate" class="form-control" ng-model="interval.startDate" ng-date-input="DD.MM.YYYY HH:mm">
+                                    <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+                                </div>
+                            </a>
+                            <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+                                <datetimepicker ng-model="interval.startDate"
+                                                datetimepicker-config="{ dropdownSelector: '#startDateDropdown' }"
+                                                before-render="startDateBeforeRender($dates)"></datetimepicker>
+                            </ul>
                         </div>
                     </fieldset>
                 </div>
-            </div>
 
-            <!--Дата-->
-            <div class="toolbox-fieldset" ng-if="userCameras.groups.length > 0">
-                <label>Дата и время с</label>
-                <fieldset>
-                    <div class="dropdown dropdown-start-date">
-                        <a class="dropdown-toggle" id="startDateDropdown" role="button" data-toggle="dropdown" data-target=".dropdown-start-date" href="#">
-                            <div class="input-group">
-                                <input type="text" id="startDate" name="startDate" class="form-control" ng-model="interval.startDate" ng-date-input="DD.MM.YYYY HH:mm">
-                                <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
-                            </div>
-                        </a>
-                        <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
-                            <datetimepicker ng-model="interval.startDate"
-                                            datetimepicker-config="{ dropdownSelector: '.dropdown-start-date' }"
-                                            before-render="startDateBeforeRender($dates)"></datetimepicker>
-                        </ul>
-                    </div>
-                </fieldset>
-            </div>
+                <!--Время-->
+                <div class="toolbox-fieldset" ng-if="userCameras.groups.length > 0">
+                    <label>Дата и время до</label>
+                    <fieldset>
+                        <div class="dropdown dropdown-end-date">
+                            <a class="dropdown-toggle" id="endDateDropdown" role="button" data-toggle="dropdown" data-target=".dropdown-end-date" href="#">
+                                <div class="input-group">
+                                    <input type="text" id="endDate" name="endDate" class="form-control" ng-model="interval.endDate" ng-date-input="DD.MM.YYYY HH:mm">
+                                    <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+                                </div>
+                            </a>
+                            <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+                                <datetimepicker ng-model="interval.endDate"
+                                                datetimepicker-config="{ dropdownSelector: '#endDateDropdown' }"
+                                                before-render="startDateBeforeRender($dates)"></datetimepicker>
+                            </ul>
+                        </div>
+                    </fieldset>
+                </div>
 
-            <!--Время-->
-            <div class="toolbox-fieldset" ng-if="userCameras.groups.length > 0">
-                <label>Дата и время до</label>
-                <fieldset>
-                    <div class="dropdown dropdown-end-date">
-                        <a class="dropdown-toggle" id="endDateDropdown" role="button" data-toggle="dropdown" data-target=".dropdown-end-date" href="#">
-                            <div class="input-group">
-                                <input type="text" id="endDate" name="endDate" class="form-control" ng-model="interval.endDate" ng-date-input="DD.MM.YYYY HH:mm">
-                                <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
-                            </div>
-                        </a>
-                        <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
-                            <datetimepicker ng-model="interval.endDate"
-                                            datetimepicker-config="{ dropdownSelector: '.dropdown-end-date' }"
-                                            before-render="startDateBeforeRender($dates)"></datetimepicker>
-                        </ul>
-                    </div>
-                </fieldset>
-            </div>
-
-            <div class="toolbox-fieldset">
-                <fieldset>
-                    <button class="btn btn-default" type="button" ng-click="addCamera()" ng-disabled="selectedCameras.length >= 4">Добавить камеру</button>
-                </fieldset>
+                <div class="toolbox-fieldset">
+                    <fieldset>
+                        <button class="btn btn-default" type="button" ng-click="addCamera()" ng-disabled="selectedCameras.length >= 4">Добавить камеру</button>
+                    </fieldset>
+                </div>
             </div>
         </div>
 
@@ -104,61 +107,87 @@
             <div ng-if="recordsMode === 'archive'" class="slider-main slider-main--records">
                 <!--<div class="table">
 
-                    <div class="table-left" ng-class="{'without-analize': selectedCamera.analysis == 1}">
-                        <div class="ng-decorate-scroll" ng-decorate-scroll id="datesList">
-                            <ul class="dates-list">
-                                <li ng-repeat="eventDay in eventsList">
-                                    <div ng-if="selectedCamera.analysis != 1">
-                                        <span class="event false border bigger">{{eventDay.efalse}}</span>
-                                        <span class="event noreact border bigger">{{eventDay.noreacts}}</span>
-                                        <span class="event ealert border bigger">{{eventDay.alerts}}</span>
-                                    </div><br />
-                                    {{eventDay.date | date: "dd.MM.yyyy"}} <br> {{eventDay.date | date: "EEE"}}
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="table-main">
-                        <div class="table-main-container">
-                            <div class="ng-decorate-scroll" id="eventsList">
-                                <div ng-repeat="eventDay in eventsList" class="table-main-row">
-                                    <ul>
-                                        <li ng-repeat="decade in eventDay.events" ng-if="decade.isVisible">
+        <div class="table-left" ng-class="{'without-analize': selectedCamera.analysis == 1}">
+            <div class="ng-decorate-scroll" ng-decorate-scroll id="datesList">
+                <ul class="dates-list">
+                    <li ng-repeat="eventDay in eventsList">
+                        <div ng-if="selectedCamera.analysis != 1">
+                            <span class="event false border bigger">{{eventDay.efalse}}</span>
+                            <span class="event noreact border bigger">{{eventDay.noreacts}}</span>
+                            <span class="event ealert border bigger">{{eventDay.alerts}}</span>
+                        </div><br />
+                        {{eventDay.date | date: "dd.MM.yyyy"}} <br> {{eventDay.date | date: "EEE"}}
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="table-main">
+            <div class="table-main-container">
+                <div class="ng-decorate-scroll" id="eventsList">
+                    <div ng-repeat="eventDay in eventsList" class="table-main-row">
+                        <ul>
+                            <li ng-repeat="decade in eventDay.events" ng-if="decade.isVisible">
 
-                                            <span>{{decade.ts|date:'HH:mm'}}</span>
-                                            <div class="preview">
-                                                <div class="events-v-panel">
-                                                    <span class="event false border bigger" ng-show="decade.efalse">{{decade.efalse}}</span>
-                                                    <span class="event noreact border bigger" ng-show="decade.noreacts">{{decade.noreacts}}</span>
-                                                    <span class="event ealert border bigger" ng-show="decade.alerts">{{decade.alerts}}</span>
-                                                </div>
-                                                <a target="_blank" href="{{selectedCamera.archive_url}}{{decade.archivePostfix}}"
-                                                   ng-if="currentUser.is_organization_admin"
-                                                   class="download-button">
-                                                    <img ng-src="/static/images/download-arrow.png">
-                                                </a>
-                                                <a ui-sref="main.base.recordsPlayer({post: '{{decade.archivePostfix.split('.')[0]}}', filters: '{{filters}}'})">
-                                                    <img ng-if="selectedCamera.analysis !== 1" ng-src="{{selectedCamera.thumb_url}}{{decade.ts / 1000}}/">
-                                                    <img ng-if="selectedCamera.analysis === 1" ng-src="{{selectedCamera.thumb_url_record}}">
-                                                </a>
-                                            </div>
-                                        </li>
-                                    </ul>
+                                <span>{{decade.ts|date:'HH:mm'}}</span>
+                                <div class="preview">
+                                    <div class="events-v-panel">
+                                        <span class="event false border bigger" ng-show="decade.efalse">{{decade.efalse}}</span>
+                                        <span class="event noreact border bigger" ng-show="decade.noreacts">{{decade.noreacts}}</span>
+                                        <span class="event ealert border bigger" ng-show="decade.alerts">{{decade.alerts}}</span>
+                                    </div>
+                                    <a target="_blank" href="{{selectedCamera.archive_url}}{{decade.archivePostfix}}"
+                                       ng-if="currentUser.is_organization_admin"
+                                       class="download-button">
+                                        <img ng-src="/static/images/download-arrow.png">
+                                    </a>
+                                    <a ui-sref="main.base.recordsPlayer({post: '{{decade.archivePostfix.split('.')[0]}}', filters: '{{filters}}'})">
+                                        <img ng-if="selectedCamera.analysis !== 1" ng-src="{{selectedCamera.thumb_url}}{{decade.ts / 1000}}/">
+                                        <img ng-if="selectedCamera.analysis === 1" ng-src="{{selectedCamera.thumb_url_record}}">
+                                    </a>
                                 </div>
-                            </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div> -->
+
+                <div style="display: table; width: 100%; background-color: black;">
+                    <div style="display: table-row">
+                        <div style="display:table-cell" ng-if="selectedCameras.length > 0" class="video-container">
+                            <video controls
+                                   ng-shaka-player="'http://' + selectedCameras[0].server.address + ':5005/archive_video?startTs='+interval.startDate.getTime()+'&endTs='+interval.endDate.getTime()+'&cameras='+selectedCameras[0].camera.id + '&skip=0&limit=10000'"></video>
+                        </div>
+                        <div style="display:table-cell"
+                             ng-if="selectedCameras.length > 1"
+                             class="video-container">
+                            <video ng-shaka-player="'http://' + selectedCameras[1].server.address + ':5005/archive_video?startTs='+interval.startDate.getTime()+'&endTs='+interval.endDate.getTime()+'&cameras='+selectedCameras[1].camera.id + '&skip=0&limit=10000'"></video>
                         </div>
                     </div>
-                </div> -->
+                    <div style="display: table-row" 
+                         ng-if="selectedCameras.length > 2">
+                        <div style="display:table-cell" class="video-container">
+                            <video ng-shaka-player="'http://' + selectedCameras[2].server.address + ':5005/archive_video?startTs='+interval.startDate.getTime()+'&endTs='+interval.endDate.getTime()+'&cameras='+selectedCameras[2].camera.id + '&skip=0&limit=10000'"></video>
+                        </div>
+                        <div style="display:table-cell"
+                             ng-if="selectedCameras.length > 3"
+                             class="video-container">
+                            <video ng-shaka-player="'http://' + selectedCameras[3].server.address + ':5005/archive_video?startTs='+interval.startDate.getTime()+'&endTs='+interval.endDate.getTime()+'&cameras='+selectedCameras[3].camera.id + '&skip=0&limit=10000'"></video>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="video-controlls">
                     <div ng-repeat="selectedCameraRef in selectedCameras track by $index" class="progressbar">
                         <!--<div class="starttime"></div>
-        <div class="endtime">
-            <a target="_blank"
-                ng-if="currentUser.is_organization_admin"
-                ng-href="{{vd.video.src}}" class="download-button" style="margin-left: 10px;">
-                <img src="/static/images/download-arrow.png">
-            </a>
-        </div>-->
+            <div class="endtime">
+                <a target="_blank"
+                    ng-if="currentUser.is_organization_admin"
+                    ng-href="{{vd.video.src}}" class="download-button" style="margin-left: 10px;">
+                    <img src="/static/images/download-arrow.png">
+                </a>
+            </div>-->
                         <div class="arrow" ng-click="prevTimeRange()">
                             <div class="left"></div>
                         </div>
@@ -192,10 +221,11 @@
 
             </div>
             <div ng-if="recordsMode === 'journal'" class="slider-main slider-main--records">
-                <table ng-init="sortUsers('username')" class="list">
+                <table ng-init="sortUsers('username')" class="list" ng-if="!isVideoOpened">
                     <thead>
                         <tr>
                             <td></td>
+                            <td>Камера</td>
                             <td>Время</td>
                             <td>Тип</td>
                             <td>Реакция</td>
@@ -205,10 +235,11 @@
                     <tbody ng-repeat="server in servers">
                         <tr ng-repeat="event in server.events">
                             <td>
-                                <a ui-sref="main.base.recordsPlayer({post: '{{event.archiveStartHint.split('.')[0]}}', filters: '{{filters}}'})">
+                                <a ng-click="openEventVideo(event)" style="cursor: pointer;">
                                     <img src="/static/images/buttons/play.svg" alt="">
                                 </a>
                             </td>
+                            <td>{{getCamera(event.cam).name}}</td>
                             <td>{{event.startTs | date: "dd.MM.yyyy HH:mm"}}</td>
                             <td>
                                 <div>{{ event.type | typeByEvent }}</div>
@@ -222,6 +253,9 @@
                         </tr>
                     </tbody>
                 </table>
+                <button class="btn btn-primary" style="margin:5px; background-color: #2b91ed; border-color: #2b91ed;" ng-if="isVideoOpened" ng-click="closeEventVideo()">Назад</button>
+                <div class="video-container" ng-if="isVideoOpened"
+                     ng-archive-video="openedCameraRef" ng-archive-video-event="openedEvent"></div>
             </div>
         </div>
         <div class="slider-event-tools" ng-if="isEventFilterShow">

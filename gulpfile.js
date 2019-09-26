@@ -137,6 +137,7 @@ gulp.task('app:js', function() {
         path.join(folders['npm'], 'lodash', 'lodash.min.js'),
         path.join(folders['npm'], 'moment', 'moment.js'),
         path.join(folders['npm'], 'bootstrap', 'dist', 'js', 'bootstrap.js'),
+        path.join(folders['npm'], 'shaka-player', 'dist', 'shaka-player.compiled.js'),
         path.join(folders['npm'], 'angularjs-bootstrap-datetimepicker', 'src', 'js', 'datetimepicker.js'),
         path.join(folders['npm'], 'angularjs-bootstrap-datetimepicker', 'src', 'js', 'datetimepicker.templates.js'),
         path.join(output, folders['js'], 'main.js'),

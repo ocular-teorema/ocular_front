@@ -11,12 +11,17 @@ angular
             $scope.isEventFilterShow = true;
             $scope.servers = [];
             $scope.selectedCameras = [];
+            //$scope.loadArchiveVideosPending = false;
             $scope.toggleMode = function (mode) {
                 $scope.recordsMode = mode;
                 //$scope.applyFilters();
 
                 //if ($scope.recordsMode === 'journal') {
                 //    getEvents();
+                //}
+                //if ($scope.recordsMode === 'archive' && $scope.loadArchiveVideosPending) {
+                //    for (var i = 0; i < $scope.servers.length; i++)
+                //        loadArchiveVideos($scope.servers[i], 0);
                 //}
             };
 
@@ -49,8 +54,56 @@ angular
                 }
             };
 
+            //var loadArchiveVideos = function (server, skip) {
+            //    if ($scope.recordsMode !== 'archive') {
+            //        $scope.loadArchiveVideosPending = true;
+            //        return;
+            //    }
+            //    else {
+            //        $scope.loadArchiveVideosPending = false;
+            //    }
+            //    setTimeout(function () {
+            //        var selectedCameras = $scope.selectedCameras.filter(function (sc) { return sc.camera.server === server.id; });
+            //        if (selectedCameras.length > 0) {
+            //            if (skip === 0) {
+            //                for (var i = 0; i < $scope.selectedCameras.length; i++) {
+            //                    $scope.selectedCameras[i].video.pause();
+            //                    $scope.selectedCameras[i].video.innerHTML = '';
+            //                }
+            //            }
+            //            var selectedRefs = selectedCameras
+            //                .filter(function (cameraRef) { return cameraRef.camera && cameraRef.camera.id; })
+            //                .map(function (cameraRef) { return cameraRef.camera.id; });
+            //            if (selectedRefs.length > 0) {
+            //                server.loadingEventVideos = false;
+            //                ArchiveService.getArchiveVideos(
+            //                    server.address,
+            //                    $scope.interval.startDate.getTime(),
+            //                    $scope.interval.endDate.getTime(),
+            //                    selectedRefs,
+            //                    skip
+            //                ).then(function (resp) {
+            //                    var cameraMap = {};
+            //                    for (var c = 0; c < $scope.selectedCameras.length; c++) {
+            //                        cameraMap['cam' + $scope.selectedCameras[c].camera.id] = $scope.selectedCameras[c];
+            //                    }
+            //                    for (var i = 0; i < resp.data.length; i++) {
+            //                        var source = document.createElement('source');
+            //                        source.src = 'http://' + cameraMap[resp.data[i].cam].server.address + ':8080' + resp.data[i].archivePostfix;
+            //                        source.type = 'video/mp4';
+            //                        cameraMap[resp.data[i].cam].video.appendChild(source);
+            //                    }
+            //                    for (c = 0; c < $scope.selectedCameras.length; c++) {
+            //                        $scope.selectedCameras[c].video.play();
+            //                    }
+            //                    server.loadingEventVideos = false;
+            //                });
+            //            }
+            //        }
+            //    }, 0);
+            //};
+
             var loadEvents = function (server, skip) {
-                debugger;
                 if (skip === 0)
                     server.events = [];
                 var selectedCameras = $scope.selectedCameras.filter(function (sc) { return sc.camera.server === server.id; });
@@ -150,6 +203,7 @@ angular
                         }
                         for (var i = 0; i < $scope.servers.length; i++) {
                             loadStats($scope.servers[i]);
+                            //loadArchiveVideos($scope.servers[i], 0);
                             loadEvents($scope.servers[i], 0);
                         }
                     });
@@ -164,6 +218,7 @@ angular
                         }
                         for (var i = 0; i < $scope.servers.length; i++) {
                             loadStats($scope.servers[i]);
+                            //loadArchiveVideos($scope.servers[i], 0);
                             loadEvents($scope.servers[i], 0);
                         }
                     });
@@ -185,7 +240,8 @@ angular
                     for (var j = 0; j < group.cameras.length > 0; j++) {
                         var cam = group.cameras[j];
                         if (!$scope.selectedCameras.filter(function (sc) { return sc.camera.id === cam.id; })[0]) {
-                            $scope.setCameraModel(group, group.cameras[j]);
+                            var newCameraRef = { server: null, group: group, camera: group.cameras[j] };
+                            $scope.setCameraModel(group.cameras[j], null, newCameraRef, true);
                             return;
                         }
                     }
@@ -196,6 +252,7 @@ angular
                 var selectedCamera = $scope.selectedCameras[index];
                 $scope.selectedCameras.splice(index, 1);
                 loadStats(selectedCamera.server);
+                //loadArchiveVideos(selectedCamera.server, 0);
                 loadEvents(selectedCamera.server, 0);
             };
 
@@ -233,12 +290,15 @@ angular
             var eventsListIsFocused = false;
             var datesListIsFocused = false;
 
-            $scope.setCameraModel = function (group, camera) {
-                var srv = $scope.servers.filter(function (s) { return s.id === camera.server; })[0];
-                if (srv) {
-                    $scope.selectedCameras.push({ server: srv, group: group, camera: camera });
-                    loadStats(srv);
-                    loadEvents(srv, 0);
+            $scope.setCameraModel = function (camera, values, cameraRef, addNew) {
+                var server = $scope.servers.filter(function (s) { return s.id === camera.server; })[0];
+                if (server) {
+                    cameraRef.server = server;
+                    if (addNew)
+                        $scope.selectedCameras.push(cameraRef);
+                    loadStats(server);
+                    //loadArchiveVideos(selectedCamera.server, 0);
+                    loadEvents(server, 0);
                 } else {
                     ServersService.getServer(camera.server).then(function (res) {
                         var newServer = {
@@ -247,9 +307,12 @@ angular
                             events: [],
                             stats: {}
                         };
-                        $scope.selectedCameras.push({ server: newServer, group: group, camera: camera });
                         $scope.servers.push(newServer);
+                        cameraRef.server = newServer;
+                        if (addNew)
+                            $scope.selectedCameras.push(cameraRef);
                         loadStats(newServer);
+                        //loadArchiveVideos(newServer, 0);
                         loadEvents(newServer, 0);
                     });
                 }
@@ -290,7 +353,105 @@ angular
                 return 'confidence-medium';
             };
 
+            $scope.initVideo = function (player, cameraRef, event) {
+                player = player.get(0);
+                player.autoplay = false;
+                player.currentTime = 0;
+                player.muted = true;
+
+                var src = 'http://' + cameraRef.server.address + ':8080';
+
+                cameraRef.loadedVideo = false;
+                cameraRef.loadedmetadata = false;
+                cameraRef.loadedmetaerror = false;
+
+                player.onerror = function () {
+                    cameraRef.loadedVideo = true;
+                    cameraRef.loadedmetadata = false;
+                    cameraRef.loadedmetaerror = true;
+                    $scope.$apply();
+                };
+
+                player.onloadedmetadata = function () {
+                    cameraRef['loadedVideo'] = true;
+                    cameraRef['loadedmetadata'] = true;
+                    cameraRef['loadedmetaerror'] = false;
+                    //var lastTime = $scope['currentQuadrator']['cameras'].find(function (camera) {
+                    //    return !!camera['video'];
+                    //});
+                    //lastTime = lastTime ? lastTime['video']['currentTime'] : 0;
+                    //$scope.currentQuadrator.cameras.map(function (cam) {
+                    //    if (cam.video) {
+                    //        cam.video.playbackRate = $scope.selectedOptions.speed;
+                    //    }
+                    //    if (cam.video && (cam.video.currentTime >= lastTime)) {
+                    //        lastTime = Math.max(lastTime, cam.video.currentTime);
+                    //        mainPlayer = cam.video;
+                    //    }
+                    //});
+                    //player.currentTime = lastTime;
+                    player.currentTime = event.offset;
+                    player.play();
+                    $scope.$apply();
+                };
+                if (event) {
+                    player.src = src + event.archiveStartHint;
+                }
+                cameraRef.video = player;
+
+            };
+
+            $scope.openEventVideo = function (event) {
+                $scope.isVideoOpened = true;
+                $scope.openedCameraRef = $scope.selectedCameras.filter(function (cr) { return 'cam' + cr.camera.id === event.cam; })[0];
+                $scope.openedEvent = event;
+            };
+            $scope.closeEventVideo = function () {
+                $scope.isVideoOpened = false;
+            };
+            $scope.getCamera = function (eventCamId) {
+                var cameraRef = $scope.selectedCameras.filter(function (cr) { return 'cam' + cr.camera.id === eventCamId; })[0];
+                if (cameraRef && cameraRef.camera)
+                    return cameraRef.camera;
+                return null;
+            };
+
             $scope.addCamera();
-        }
-    );
+        })
+    .directive('ngArchiveVideo',
+        function () {
+            return {
+                'restrict': 'A',
+                'scope': {
+                    ngArchiveVideo: '=',
+                    ngArchiveVideoEvent: '='
+                },
+                'controller': function ($scope) {
+
+                },
+                'link': function ($scope, element) {
+                    var iniContainer = function () {
+                        var video = angular.element('<video muted="muted" controls preload="metadata"></video>').appendTo(element);
+                        $scope.$parent.initVideo(video, $scope.ngArchiveVideo, $scope.ngArchiveVideoEvent);
+                    };
+                    $scope.$watch('ngArchiveVideo', function (newV, oldV) {
+                        if (newV === oldV)
+                            return;
+                        if (oldV.video) {
+                            angular.element(oldV.video).empty().remove();
+                        }
+                        iniContainer();
+                    });
+                    $scope.$watch('ngArchiveVideoEvent', function (newV, oldV) {
+                        if (newV === oldV)
+                            return;
+                        if ($scope.ngArchiveVideo.video) {
+                            angular.element($scope.ngArchiveVideo.video).empty().remove();
+                        }
+                        iniContainer();
+                    });
+                    iniContainer();
+                }
+            };
+        });
 

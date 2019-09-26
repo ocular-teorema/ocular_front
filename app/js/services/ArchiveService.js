@@ -24,7 +24,10 @@ angular
                 if (filters.calibration_error)
                     types.push(EventsDescription.ALERT_TYPE_CALIBRATION_ERROR);
 
-                return $http.get('http://' + serverAddress + ':5005/archive?startTs=' + startTimestamp + '&endTs=' + endTimestamp + '&cameras=' + cameraIds.join(',') + '&react=' + react.join(',') + '&types=' + types.join(',') + '&conf_low=' + (filters.confidence.low ? 1 : 0) + '&conf_medium=' + (filters.confidence.medium ? 1 : 0) + '&conf_high=' + (filters.confidence.high ? 1 : 0) + '&skip=' + skip);
+                return $http.get('http://' + serverAddress + ':5005/archive?startTs=' + startTimestamp + '&endTs=' + endTimestamp + '&cameras=' + cameraIds.join(',') + '&react=' + react.join(',') + '&types=' + types.join(',') + '&conf_low=' + (filters.confidence.low ? 1 : 0) + '&conf_medium=' + (filters.confidence.medium ? 1 : 0) + '&conf_high=' + (filters.confidence.high ? 1 : 0) + '&skip=' + skip + '&limit=10000');
+            },
+            getArchiveVideos: function (serverAddress, startTimestamp, endTimestamp, cameraIds, skip) {
+                return $http.get('http://' + serverAddress + ':5005/archive_video?startTs=' + startTimestamp + '&endTs=' + endTimestamp + '&cameras=' + cameraIds.join(',') + '&skip=' + skip + '&limit=10000');
             }
         };
     });

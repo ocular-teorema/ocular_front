@@ -52,6 +52,13 @@
 
         .slider-main--records {
             width: 100%;
+
+            .video-container {
+                video {
+                    width: 100%;
+                    max-height: 100vh;
+                }
+            }
         }
     }
 
@@ -69,6 +76,11 @@
         z-index: 9;
         transition: all 0.2s ease 0s;
         top: 0;
+
+        > div {
+            position: sticky;
+            top: 0;
+        }
 
         .form-field {
             margin-bottom: 0;
@@ -613,6 +625,7 @@
     .progressbar {
         width: 100%;
         display: table;
+        margin-bottom: 5px;
 
         .arrow {
             display: table-cell;
