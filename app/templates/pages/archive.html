@@ -155,25 +155,32 @@
 
                 <div style="display: table; width: 100%; background-color: black;">
                     <div style="display: table-row">
-                        <div style="display:table-cell" ng-if="selectedCameras.length > 0" class="video-container">
-                            <video controls
-                                   ng-shaka-player="'http://' + selectedCameras[0].server.address + ':5005/archive_video?startTs='+interval.startDate.getTime()+'&endTs='+interval.endDate.getTime()+'&cameras='+selectedCameras[0].camera.id + '&skip=0&limit=10000'"></video>
+                        <div style="display:table-cell; width: auto;" ng-if="selectedCameras.length > 0" class="video-container">
+                            <video autoplay
+                                   ng-shaka-player="'http://' + selectedCameras[0].server.address + ':5005/archive_video?startTs='+interval.startDate.getTime()+'&endTs='+interval.endDate.getTime()+'&cameras='+selectedCameras[0].camera.id + '&skip=0&limit=10000'"
+                                   ref="selectedCameras[0]"></video>
                         </div>
-                        <div style="display:table-cell"
+                        <div style="display:table-cell; width: 50%;"
                              ng-if="selectedCameras.length > 1"
                              class="video-container">
-                            <video ng-shaka-player="'http://' + selectedCameras[1].server.address + ':5005/archive_video?startTs='+interval.startDate.getTime()+'&endTs='+interval.endDate.getTime()+'&cameras='+selectedCameras[1].camera.id + '&skip=0&limit=10000'"></video>
+                            <video autoplay
+                                   ng-shaka-player="'http://' + selectedCameras[1].server.address + ':5005/archive_video?startTs='+interval.startDate.getTime()+'&endTs='+interval.endDate.getTime()+'&cameras='+selectedCameras[1].camera.id + '&skip=0&limit=10000'"
+                                   ref="selectedCameras[1]"></video>
                         </div>
                     </div>
                     <div style="display: table-row" 
                          ng-if="selectedCameras.length > 2">
-                        <div style="display:table-cell" class="video-container">
-                            <video ng-shaka-player="'http://' + selectedCameras[2].server.address + ':5005/archive_video?startTs='+interval.startDate.getTime()+'&endTs='+interval.endDate.getTime()+'&cameras='+selectedCameras[2].camera.id + '&skip=0&limit=10000'"></video>
+                        <div style="display:table-cell; width: auto;" class="video-container">
+                            <video autoplay
+                                   ng-shaka-player="'http://' + selectedCameras[2].server.address + ':5005/archive_video?startTs='+interval.startDate.getTime()+'&endTs='+interval.endDate.getTime()+'&cameras='+selectedCameras[2].camera.id + '&skip=0&limit=10000'"
+                                   ref="selectedCameras[2]"></video>
                         </div>
-                        <div style="display:table-cell"
+                        <div style="display:table-cell; width: 50%;"
                              ng-if="selectedCameras.length > 3"
                              class="video-container">
-                            <video ng-shaka-player="'http://' + selectedCameras[3].server.address + ':5005/archive_video?startTs='+interval.startDate.getTime()+'&endTs='+interval.endDate.getTime()+'&cameras='+selectedCameras[3].camera.id + '&skip=0&limit=10000'"></video>
+                            <video autoplay
+                                   ng-shaka-player="'http://' + selectedCameras[3].server.address + ':5005/archive_video?startTs='+interval.startDate.getTime()+'&endTs='+interval.endDate.getTime()+'&cameras='+selectedCameras[3].camera.id + '&skip=0&limit=10000'"
+                                   ref="selectedCameras[3]"></video>
                         </div>
                     </div>
                 </div>
@@ -191,7 +198,7 @@
                         <div class="arrow" ng-click="prevTimeRange()">
                             <div class="left"></div>
                         </div>
-                        <div class="line" ng-video-line="vd">
+                        <div class="line" ng-click="progressClicked($event)">
                             <!--<img class="slider" src="/static/images/slider.png">-->
                             <div class="events-list-line">
                                 <span ng-repeat="event in selectedCameraRef.server.events | filter:cameraEventsFilter(selectedCameraRef.camera.id) track by $index"
@@ -202,6 +209,7 @@
                                     <span class="event-tooltip">{{ event.type | typeByEvent }}</span>
                                 </span>
                             </div>
+                            <div ng-if="$first" style="width: 0px; border-left: 1px solid black; height: {{26 * selectedCameras.length + 20}}px ; position: absolute; top: -10px; left: {{currentPlayerTimePercent}}%"></div>
                         </div>
                         <div class="arrow" ng-click="nextTimeRange()">
                             <div class="right"></div>

@@ -240,8 +240,12 @@ angular
                     for (var j = 0; j < group.cameras.length > 0; j++) {
                         var cam = group.cameras[j];
                         if (!$scope.selectedCameras.filter(function (sc) { return sc.camera.id === cam.id; })[0]) {
-                            var newCameraRef = { server: null, group: group, camera: group.cameras[j] };
-                            $scope.setCameraModel(group.cameras[j], null, newCameraRef, true);
+                            var newCameraRef = {
+                                server: null,
+                                group: group,
+                                camera: group.cameras[j]
+                            };
+                            $scope.setCameraModel(group.cameras[j], null, newCameraRef, null, true);
                             return;
                         }
                     }
@@ -290,15 +294,70 @@ angular
             var eventsListIsFocused = false;
             var datesListIsFocused = false;
 
-            $scope.setCameraModel = function (camera, values, cameraRef, addNew) {
+            // With requestAnimationFrame, we can ensure that as 
+            // frequently as the browser would allow, 
+            // the video is resync'ed.
+            function sync() {
+                var player = $scope.selectedCameras[0].shaka.getMediaElement();
+                for (var i = 1; i < $scope.selectedCameras.length; i++) {
+                    if ($scope.selectedCameras[i].shaka.getMediaElement().readyState === 4)
+                        $scope.selectedCameras[i].shaka.getMediaElement().currentTime = player.currentTime;
+                }
+
+                if (!player.paused) {
+                    requestAnimationFrame(sync);
+                }
+            };
+
+            var onPlay = function () {
+                for (var i = 1; i < $scope.selectedCameras.length; i++)
+                    $scope.selectedCameras[i].shaka.getMediaElement().play();
+                sync();
+            };
+            var onPause = function () {
+                for (var i = 1; i < $scope.selectedCameras.length; i++)
+                    $scope.selectedCameras[i].shaka.getMediaElement().pause();
+            };
+            var onTimeUpdate = function () {
+                if (this.paused) {
+                    return;
+                }
+                $scope.currentPlayerTimePercent = Math.floor(this.currentTime * 1000 / this.duration) / 10;
+                $scope.$apply();
+            };
+
+            var onSeeking = function () {
+                for (var i = 1; i < $scope.selectedCameras.length; i++)
+                    $scope.selectedCameras[i].shaka.getMediaElement().currentTime = this.currentTime;
+                $scope.currentPlayerTimePercent = Math.floor(this.currentTime * 1000 / this.duration) / 10;
+                $scope.$apply();
+            };
+
+            $scope.setCurrentPlayerTime = function (val) {
+                for (var i = 0; i < $scope.selectedCameras.length; i++)
+                    $scope.selectedCameras[i].shaka.getMediaElement().currentTime = val;
+            };
+
+            $scope.setCameraModel = function (camera, values, cameraRef, oldCamera, addNew) {
+                function initCamera(cameraRef) {
+                    setTimeout(function () {
+                        $scope.selectedCameras[0].shaka.getMediaElement().addEventListener("play", onPlay);
+                        $scope.selectedCameras[0].shaka.getMediaElement().addEventListener("pause", onPause);
+                        $scope.selectedCameras[0].shaka.getMediaElement().addEventListener("timeupdate", onTimeUpdate);
+                        $scope.selectedCameras[0].shaka.getMediaElement().addEventListener("seeking", onSeeking);
+
+                        loadStats(cameraRef.server);
+                        //loadArchiveVideos(newServer, 0);
+                        loadEvents(cameraRef.server, 0);
+                    }, 0);
+                }
+
                 var server = $scope.servers.filter(function (s) { return s.id === camera.server; })[0];
                 if (server) {
                     cameraRef.server = server;
                     if (addNew)
                         $scope.selectedCameras.push(cameraRef);
-                    loadStats(server);
-                    //loadArchiveVideos(selectedCamera.server, 0);
-                    loadEvents(server, 0);
+                    initCamera(cameraRef);
                 } else {
                     ServersService.getServer(camera.server).then(function (res) {
                         var newServer = {
@@ -311,9 +370,7 @@ angular
                         cameraRef.server = newServer;
                         if (addNew)
                             $scope.selectedCameras.push(cameraRef);
-                        loadStats(newServer);
-                        //loadArchiveVideos(newServer, 0);
-                        loadEvents(newServer, 0);
+                        initCamera(cameraRef);
                     });
                 }
             };
@@ -414,6 +471,12 @@ angular
                 if (cameraRef && cameraRef.camera)
                     return cameraRef.camera;
                 return null;
+            };
+
+            $scope.progressClicked = function ($event) {
+                var player = $scope.selectedCameras[0].shaka.getMediaElement();
+                var rect = $event.currentTarget.getBoundingClientRect();
+                player.currentTime = player.duration * ($event.clientX - rect.left) / rect.width;
             };
 
             $scope.addCamera();

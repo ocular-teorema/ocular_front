@@ -30,7 +30,18 @@ OcularShakaManifestGenerator.prototype.stop = function () {
 
 OcularShakaManifestGenerator.prototype.loadManifest_ = function (data, serverAddress) {
     var timeline = new shaka.media.PresentationTimeline(null, 0);
-    timeline.setDuration(data.length > 0 ? Math.floor((data[data.length - 1].end - data[0].start) / 1000) : 0);  // seconds
+    data = data.sort(function compare(a, b) {
+        if (a.start < b.start) {
+            return -1;
+        }
+        if (a.start > b.start) {
+            return 1;
+        }
+        return 0;
+    });
+    var duration = data.length > 0 ? Math.floor((data[data.length - 1].end - data[0].start) / 1000) : 0;
+    debugger;
+    timeline.setDuration(duration);  // seconds
 
     var manifest = {
         presentationTimeline: timeline,
@@ -250,23 +261,23 @@ module.directive('ngShakaPlayer', function ($timeout) {
     return {
         'restrict': 'A',
         'scope': {
-            ngShakaPlayer: '='
+            ngShakaPlayer: '=',
+            ref: '='
         },
         'controller': function ($scope) {
         },
 
         'link': function ($scope, element) {
             var video = element.get(0);
-            var player = new shaka.Player(video);
-            player.getNetworkingEngine().registerResponseFilter(removeBaseDataOffsetResponseFilter);
-
+            $scope.ref.shaka = new shaka.Player(video);
+            $scope.ref.shaka.getNetworkingEngine().registerResponseFilter(removeBaseDataOffsetResponseFilter);
             // Listen for error events.
-            player.addEventListener('error', onErrorEvent);
+            $scope.ref.shaka.addEventListener('error', onErrorEvent);
 
             $scope.$watch('ngShakaPlayer', function (url) {
                 // Try to load a manifest.
                 // This is an asynchronous process.
-                player.load(url).then(function () {
+                $scope.ref.shaka.load(url).then(function () {
                     // This runs if the asynchronous load is successful.
                     console.log('The video has now been loaded!');
                 }).catch(onError);  // onError is executed if the asynchronous load fails.
