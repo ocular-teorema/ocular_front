@@ -166,8 +166,7 @@ module.controller('streamController', function (
             }).map(function (cam) {
                 return cam.camera_id;
             }), function (eventData) {
-
-                if ($scope.camerasQuadrator)
+                if (!$scope.camerasQuadrator)
                     return;
                 var cameras = [];
 
