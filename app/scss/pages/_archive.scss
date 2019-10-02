@@ -54,9 +54,32 @@
             width: 100%;
 
             .video-container {
+                text-align: center;
+                display: table-cell;
+                width: auto;
+                background: black;
+                position: relative;
+                width: 50%;
+                vertical-align: middle;
+
+                .bubblingG, .no-record {
+                    position: absolute;
+                    margin-left: auto;
+                    margin-right: auto;
+                    left: 0;
+                    right: 0;
+                    width: 100px;
+                    top: 30px;
+                }
+
+                .no-record {
+                    color: white;
+                }
+
                 video {
                     width: 100%;
-                    max-height: 100vh;
+                    max-height: 60vh;
+                    min-width: 150px;
                 }
             }
         }
@@ -762,28 +785,29 @@
     }
 
     .timing {
-        margin-left: 25px;
 
         .timemark {
-            width: 100px;
             text-align: right;
+            position: absolute;
 
-            .mark {
+            .time-tick {
                 background-color: rgb(0, 0, 0);
                 opacity: 0.302;
                 width: 1px;
+                padding: 0;
                 height: 10px;
                 z-index: 858;
             }
 
             .time {
                 position: relative;
-                left: 18px;
+                left: -18px;
                 font-size: 14px;
                 color: rgba(0, 0, 0, 0.502);
                 text-transform: uppercase;
                 line-height: 1.2;
                 text-align: left;
+                width: 1px;
             }
         }
     }

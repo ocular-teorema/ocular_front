@@ -5,26 +5,23 @@ angular
         function ($scope, ArchiveService, $filter, $rootScope, EventsDescription, ServersService, $timeout, userCameras) {
             //res.data.fact_address
 
+            var lastSeek = 0;
             $scope.eventsDescription = EventsDescription;
             $scope.recordsMode = 'archive';
             $scope.isCameraFilterShow = true;
             $scope.isEventFilterShow = true;
             $scope.servers = [];
             $scope.selectedCameras = [];
-            //$scope.loadArchiveVideosPending = false;
+            $scope.loadArchiveVideosPending = false;
             $scope.toggleMode = function (mode) {
                 $scope.recordsMode = mode;
-                //$scope.applyFilters();
-
-                //if ($scope.recordsMode === 'journal') {
-                //    getEvents();
-                //}
                 //if ($scope.recordsMode === 'archive' && $scope.loadArchiveVideosPending) {
                 //    for (var i = 0; i < $scope.servers.length; i++)
                 //        loadArchiveVideos($scope.servers[i], 0);
                 //}
             };
 
+            $scope.timeMarks = [];
             $scope.timeInterval = 0;
 
             var loadStats = function (server) {
@@ -44,6 +41,11 @@ angular
                             selectedRefs
                         ).then(function (resp) {
                             $scope.timeInterval = endTs - startTs;
+                            $scope.timeMarks = [];
+                            for (var k = 0; k <= 10; k++) {
+                                var dateTime = new Date(startTs + k * $scope.timeInterval / 10);
+                                $scope.timeMarks.push($filter('date')(dateTime, 'MM/dd HH:mm'));
+                            }
 
                             server.stats = resp.data;
                             server.loadingStats = false;
@@ -54,54 +56,60 @@ angular
                 }
             };
 
-            //var loadArchiveVideos = function (server, skip) {
-            //    if ($scope.recordsMode !== 'archive') {
-            //        $scope.loadArchiveVideosPending = true;
-            //        return;
-            //    }
-            //    else {
-            //        $scope.loadArchiveVideosPending = false;
-            //    }
-            //    setTimeout(function () {
-            //        var selectedCameras = $scope.selectedCameras.filter(function (sc) { return sc.camera.server === server.id; });
-            //        if (selectedCameras.length > 0) {
-            //            if (skip === 0) {
-            //                for (var i = 0; i < $scope.selectedCameras.length; i++) {
-            //                    $scope.selectedCameras[i].video.pause();
-            //                    $scope.selectedCameras[i].video.innerHTML = '';
-            //                }
-            //            }
-            //            var selectedRefs = selectedCameras
-            //                .filter(function (cameraRef) { return cameraRef.camera && cameraRef.camera.id; })
-            //                .map(function (cameraRef) { return cameraRef.camera.id; });
-            //            if (selectedRefs.length > 0) {
-            //                server.loadingEventVideos = false;
-            //                ArchiveService.getArchiveVideos(
-            //                    server.address,
-            //                    $scope.interval.startDate.getTime(),
-            //                    $scope.interval.endDate.getTime(),
-            //                    selectedRefs,
-            //                    skip
-            //                ).then(function (resp) {
-            //                    var cameraMap = {};
-            //                    for (var c = 0; c < $scope.selectedCameras.length; c++) {
-            //                        cameraMap['cam' + $scope.selectedCameras[c].camera.id] = $scope.selectedCameras[c];
-            //                    }
-            //                    for (var i = 0; i < resp.data.length; i++) {
-            //                        var source = document.createElement('source');
-            //                        source.src = 'http://' + cameraMap[resp.data[i].cam].server.address + ':8080' + resp.data[i].archivePostfix;
-            //                        source.type = 'video/mp4';
-            //                        cameraMap[resp.data[i].cam].video.appendChild(source);
-            //                    }
-            //                    for (c = 0; c < $scope.selectedCameras.length; c++) {
-            //                        $scope.selectedCameras[c].video.play();
-            //                    }
-            //                    server.loadingEventVideos = false;
-            //                });
-            //            }
-            //        }
-            //    }, 0);
-            //};
+            var loadArchiveVideos = function (server, skip) {
+                if ($scope.recordsMode !== 'archive') {
+                    $scope.loadArchiveVideosPending = true;
+                    return;
+                }
+                else {
+                    $scope.loadArchiveVideosPending = false;
+                }
+                setTimeout(function () {
+                    var selectedCameras = $scope.selectedCameras.filter(function (sc) { return sc.camera.server === server.id; });
+                    if (selectedCameras.length > 0) {
+                        if (skip === 0) {
+                            for (var i = 0; i < $scope.selectedCameras.length; i++) {
+                                $scope.selectedCameras[i].video.pause();
+                                $scope.selectedCameras[i].video.innerHTML = '';
+                            }
+                        }
+                        var selectedRefs = selectedCameras
+                            .filter(function (cameraRef) { return cameraRef.camera && cameraRef.camera.id; })
+                            .map(function (cameraRef) { return cameraRef.camera.id; });
+                        if (selectedRefs.length > 0) {
+                            server.loadingEventVideos = false;
+                            ArchiveService.getArchiveVideos(
+                                server.address,
+                                $scope.interval.startDate.getTime(),
+                                $scope.interval.endDate.getTime(),
+                                selectedRefs,
+                                skip
+                            ).then(function (resp) {
+                                var cameraMap = {};
+                                for (var c = 0; c < $scope.selectedCameras.length; c++) {
+                                    cameraMap['cam' + $scope.selectedCameras[c].camera.id] = $scope.selectedCameras[c];
+                                    $scope.selectedCameras[c].records = [];
+                                }
+
+                                for (var i = 0; i < resp.data.length; i++) {
+                                    var record = resp.data[i];
+                                    record.src = 'http://' + cameraMap[record.cam].server.address + ':8080' + record.archivePostfix;
+                                    record.startTs = julianIntToDate(record.date);// - timezoneOffsetMs;
+                                    record.endTs = record.startTs + record.end;
+                                    record.startTs += record.start;
+                                    cameraMap[resp.data[i].cam].records.push(resp.data[i]);
+                                }
+
+                                $scope.seek(0);
+                                //for (c = 0; c < $scope.selectedCameras.length; c++) {
+                                //    $scope.selectedCameras[c].video.play();
+                                //}
+                                server.loadingEventVideos = false;
+                            });
+                        }
+                    }
+                }, 0);
+            };
 
             var loadEvents = function (server, skip) {
                 if (skip === 0)
@@ -149,6 +157,29 @@ angular
                     //camerasList.push(cam);
                 });
             });
+
+            function julianIntToDate(JD) {
+                var y = 4716;
+                var v = 3;
+                var j = 1401;
+                var u = 5;
+                var m = 2;
+                var s = 153;
+                var n = 12;
+                var w = 2;
+                var r = 4;
+                var B = 274277;
+                var p = 1461;
+                var C = -38;
+                var f = JD + j + Math.floor((Math.floor((4 * JD + B) / 146097) * 3) / 4) + C;
+                var e = r * f + v;
+                var g = Math.floor((e % p) / r);
+                var h = u * g + w;
+                var D = Math.floor((h % s) / u) + 1;
+                var M = ((Math.floor(h / s) + m) % n) + 1;
+                var Y = Math.floor(e / p) - y + Math.floor((n + m - M) / n);
+                return Date.parse(new Date(Y, M - 1, D));
+            }
 
             // $scope.archivePort = ServerConfiguration.ARCHIVE_PORT;
             var moNow = moment();
@@ -203,7 +234,7 @@ angular
                         }
                         for (var i = 0; i < $scope.servers.length; i++) {
                             loadStats($scope.servers[i]);
-                            //loadArchiveVideos($scope.servers[i], 0);
+                            loadArchiveVideos($scope.servers[i], 0);
                             loadEvents($scope.servers[i], 0);
                         }
                     });
@@ -218,7 +249,7 @@ angular
                         }
                         for (var i = 0; i < $scope.servers.length; i++) {
                             loadStats($scope.servers[i]);
-                            //loadArchiveVideos($scope.servers[i], 0);
+                            loadArchiveVideos($scope.servers[i], 0);
                             loadEvents($scope.servers[i], 0);
                         }
                     });
@@ -298,10 +329,12 @@ angular
             // frequently as the browser would allow, 
             // the video is resync'ed.
             function sync() {
-                var player = $scope.selectedCameras[0].shaka.getMediaElement();
+                var player = $scope.selectedCameras[0].video;
                 for (var i = 1; i < $scope.selectedCameras.length; i++) {
-                    if ($scope.selectedCameras[i].shaka.getMediaElement().readyState === 4)
-                        $scope.selectedCameras[i].shaka.getMediaElement().currentTime = player.currentTime;
+                    if ($scope.selectedCameras[i].video.readyState === 4) {
+                        $scope.selectedCameras[i].video.currentTime = player.currentTime;
+                        $scope.selectedCameras[i].video.play();
+                    }
                 }
 
                 if (!player.paused) {
@@ -311,43 +344,72 @@ angular
 
             var onPlay = function () {
                 for (var i = 1; i < $scope.selectedCameras.length; i++)
-                    $scope.selectedCameras[i].shaka.getMediaElement().play();
+                    $scope.selectedCameras[i].video.play();
                 sync();
             };
             var onPause = function () {
                 for (var i = 1; i < $scope.selectedCameras.length; i++)
-                    $scope.selectedCameras[i].shaka.getMediaElement().pause();
+                    $scope.selectedCameras[i].video.pause();
             };
             var onTimeUpdate = function () {
                 if (this.paused) {
                     return;
                 }
-                $scope.currentPlayerTimePercent = Math.floor(this.currentTime * 1000 / this.duration) / 10;
+                $scope.currentPlayerTimePercent = $scope.calculateCurrentPlaybackPercent();
                 $scope.$apply();
             };
 
             var onSeeking = function () {
-                for (var i = 1; i < $scope.selectedCameras.length; i++)
-                    $scope.selectedCameras[i].shaka.getMediaElement().currentTime = this.currentTime;
-                $scope.currentPlayerTimePercent = Math.floor(this.currentTime * 1000 / this.duration) / 10;
+                for (var i = 1; i < $scope.selectedCameras.length; i++) {
+                    $scope.selectedCameras[i].video.currentTime = this.currentTime;
+                    $scope.selectedCameras[i].video.play();
+                }
+                $scope.currentPlayerTimePercent = $scope.calculateCurrentPlaybackPercent();
                 $scope.$apply();
+            };
+
+            var onEnded = function () {
+                for (var i = 0; i < $scope.selectedCameras.length; i++) {
+                    var cameraRef = $scope.selectedCameras[i];
+                    if (cameraRef.currentRecord) {
+                        $scope.seek(cameraRef.currentRecord.endTs - $scope.interval.startDate);
+                        break;
+                    }
+                }
+            };
+
+            $scope.calculateCurrentPlaybackPercent = function () {
+                var currentRecord = null;
+                var video = null;
+                for (var i = 0; i < $scope.selectedCameras.length; i++) {
+                    currentRecord = $scope.selectedCameras[i].currentRecord;
+                    video = $scope.selectedCameras[i].video;
+                    if (currentRecord)
+                        break;
+                }
+                if (!currentRecord)
+                    return 0;
+                return Math.floor(100 * (video.currentTime * 1000 + currentRecord.startTs - $scope.interval.startDate.getTime()) / $scope.timeInterval);
             };
 
             $scope.setCurrentPlayerTime = function (val) {
                 for (var i = 0; i < $scope.selectedCameras.length; i++)
-                    $scope.selectedCameras[i].shaka.getMediaElement().currentTime = val;
+                    $scope.selectedCameras[i].video.currentTime = val;
             };
 
             $scope.setCameraModel = function (camera, values, cameraRef, oldCamera, addNew) {
                 function initCamera(cameraRef) {
+                    cameraRef.currentRecord = null;
+                    cameraRef.videoLoaded = false;
                     setTimeout(function () {
-                        $scope.selectedCameras[0].shaka.getMediaElement().addEventListener("play", onPlay);
-                        $scope.selectedCameras[0].shaka.getMediaElement().addEventListener("pause", onPause);
-                        $scope.selectedCameras[0].shaka.getMediaElement().addEventListener("timeupdate", onTimeUpdate);
-                        $scope.selectedCameras[0].shaka.getMediaElement().addEventListener("seeking", onSeeking);
+                        $scope.selectedCameras[0].video.addEventListener("play", onPlay);
+                        $scope.selectedCameras[0].video.addEventListener("pause", onPause);
+                        $scope.selectedCameras[0].video.addEventListener("timeupdate", onTimeUpdate);
+                        $scope.selectedCameras[0].video.addEventListener("seeking", onSeeking);
+                        $scope.selectedCameras[0].video.addEventListener("ended", onEnded);
 
                         loadStats(cameraRef.server);
-                        //loadArchiveVideos(newServer, 0);
+                        loadArchiveVideos(cameraRef.server, 0);
                         loadEvents(cameraRef.server, 0);
                     }, 0);
                 }
@@ -396,6 +458,10 @@ angular
 
             $scope.calculateEventPosition = function (event) {
                 return (event.startTs - $scope.interval.startDate.getTime()) * 100 / $scope.timeInterval;
+            };
+
+            $scope.calculateRecordPosition = function (record) {
+                return (record.startTs - $scope.interval.startDate.getTime()) * 100 / $scope.timeInterval;
             };
 
             $scope.calculateEventWidth = function (event) {
@@ -463,9 +529,11 @@ angular
                 $scope.openedCameraRef = $scope.selectedCameras.filter(function (cr) { return 'cam' + cr.camera.id === event.cam; })[0];
                 $scope.openedEvent = event;
             };
+
             $scope.closeEventVideo = function () {
                 $scope.isVideoOpened = false;
             };
+
             $scope.getCamera = function (eventCamId) {
                 var cameraRef = $scope.selectedCameras.filter(function (cr) { return 'cam' + cr.camera.id === eventCamId; })[0];
                 if (cameraRef && cameraRef.camera)
@@ -474,20 +542,77 @@ angular
             };
 
             $scope.progressClicked = function ($event) {
-                var player = $scope.selectedCameras[0].shaka.getMediaElement();
                 var rect = $event.currentTarget.getBoundingClientRect();
-                player.currentTime = player.duration * ($event.clientX - rect.left) / rect.width;
+                var startTs = $scope.interval.startDate.getTime();
+                var endTs = $scope.interval.endDate.getTime();
+                $scope.seek(Math.floor((endTs - startTs) * ($event.clientX - rect.left) / rect.width));
+            };
+
+            $scope.onDrop = function ($event, $dragData) {
+                var rect = $event.currentTarget.getBoundingClientRect();
+                var startTs = $scope.interval.startDate.getTime();
+                var endTs = $scope.interval.endDate.getTime();
+                var newDate = startTs + Math.floor((endTs - startTs) * ($event.clientX - rect.left) / rect.width);
+
+                if ($dragData === 'left') {
+                    $scope.interval.startDate = new Date(newDate);
+                } else {
+                    $scope.interval.endDate = new Date(newDate);
+                }
+            };
+
+            $scope.seek = function (relativeMs) {
+                debugger;
+                var absoluteMs = $scope.interval.startDate.getTime() + relativeMs;
+                var earliestTs = null;
+                var atLeastOneFound = false;
+                for (var i = 0; i < $scope.selectedCameras.length; i++) {
+                    var cameraRef = $scope.selectedCameras[i];
+                    if (cameraRef.currentRecord && absoluteMs >= cameraRef.currentRecord.startTs && absoluteMs < cameraRef.currentRecord.endTs) {
+                        atLeastOneFound = true;
+                        earliestTs = absoluteMs;
+                        cameraRef.video.currentTime = Math.floor((absoluteMs - cameraRef.currentRecord.startTs) / 10) / 100;
+                        cameraRef.video.play();
+                    } else {
+                        cameraRef.videoLoaded = false;
+                        var found = false;
+                        for (var j = 0; j < cameraRef.records.length; j++) {
+                            // looking for ealiest available records, in case no records are found
+                            if (cameraRef.records[j].startTs > absoluteMs && (earliestTs === null || earliestTs > cameraRef.records[j].startTs)) {
+                                earliestTs = cameraRef.records[j].startTs;
+                            }
+                            //console.log('seeking ', new Date(absoluteMs), ' among ', new Date(cameraRef.records[j].startTs), ' and ', new Date(cameraRef.records[j].endTs));
+                            if (absoluteMs >= cameraRef.records[j].startTs && absoluteMs < cameraRef.records[j].endTs) {
+                                cameraRef.currentRecord = cameraRef.records[j];
+                                console.log('found at position ', j);
+                                atLeastOneFound = found = true;
+                                break;
+                            }
+                        }
+                        if (found) {
+                            cameraRef.video.src = cameraRef.currentRecord.src;
+                            cameraRef.video.currentTime = Math.floor((absoluteMs - cameraRef.currentRecord.startTs) / 10) / 100;
+                        } else {
+                            cameraRef.currentRecord = null;
+                        }
+                    }
+                }
+                var percent = $scope.calculateCurrentPlaybackPercent();
+                $scope.currentPlayerTimePercent = percent || 100 * relativeMs / $scope.timeInterval;
+                if (!atLeastOneFound && earliestTs !== null) {
+                    $scope.seek(earliestTs - $scope.interval.startDate.getTime());
+                }
             };
 
             $scope.addCamera();
         })
-    .directive('ngArchiveVideo',
+    .directive('ngEventVideo',
         function () {
             return {
                 'restrict': 'A',
                 'scope': {
-                    ngArchiveVideo: '=',
-                    ngArchiveVideoEvent: '='
+                    ngEventVideo: '=',
+                    ngEventOpened: '='
                 },
                 'controller': function ($scope) {
 
@@ -495,9 +620,9 @@ angular
                 'link': function ($scope, element) {
                     var iniContainer = function () {
                         var video = angular.element('<video muted="muted" controls preload="metadata"></video>').appendTo(element);
-                        $scope.$parent.initVideo(video, $scope.ngArchiveVideo, $scope.ngArchiveVideoEvent);
+                        $scope.$parent.initVideo(video, $scope.ngEventVideo, $scope.ngEventOpened);
                     };
-                    $scope.$watch('ngArchiveVideo', function (newV, oldV) {
+                    $scope.$watch('ngEventVideo', function (newV, oldV) {
                         if (newV === oldV)
                             return;
                         if (oldV.video) {
@@ -505,15 +630,41 @@ angular
                         }
                         iniContainer();
                     });
-                    $scope.$watch('ngArchiveVideoEvent', function (newV, oldV) {
+                    $scope.$watch('ngEventOpened', function (newV, oldV) {
                         if (newV === oldV)
                             return;
-                        if ($scope.ngArchiveVideo.video) {
-                            angular.element($scope.ngArchiveVideo.video).empty().remove();
+                        if ($scope.ngEventVideo.video) {
+                            angular.element($scope.ngEventVideo.video).empty().remove();
                         }
                         iniContainer();
                     });
                     iniContainer();
+                }
+            };
+    })
+    .directive('ngArchiveVideo',
+        function () {
+            return {
+                'restrict': 'A',
+                'scope': {
+                    ngArchiveVideo: '='
+                },
+                'controller': function ($scope) {
+                },
+                'link': function ($scope, element) {
+                    $scope.ngArchiveVideo.video = element[0];
+                    $scope.ngArchiveVideo.videoLoaded = false;
+                    element[0].onloadedmetadata = function () {
+                        $scope.ngArchiveVideo.videoLoaded = true;
+                        element[0].play();
+                    };
+
+                    $scope.$watch('ngArchiveVideo', function (newV, oldV) {
+                        if (newV === oldV)
+                            return;
+                        $scope.ngArchiveVideo.videoLoaded = false;
+                        $scope.ngArchiveVideo.video = element[0];
+                    });
                 }
             };
         });
