@@ -100,6 +100,15 @@
                         <button class="btn btn-default" type="button" ng-click="addCamera()" ng-disabled="selectedCameras.length >= 4">Добавить камеру</button>
                     </fieldset>
                 </div>
+                <div class="toolbox-fieldset">
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-default" ng-class="{active: playbackRate === 0}" ng-click="setPlaybackRate(0)"><span class="glyphicon glyphicon-pause"></span></button>
+                        <button type="button" class="btn btn-default" ng-class="{active: playbackRate === 1}" ng-click="setPlaybackRate(1)">1x</button>
+                        <button type="button" class="btn btn-default" ng-class="{active: playbackRate === 2}" ng-click="setPlaybackRate(2)">2x</button>
+                        <button type="button" class="btn btn-default" ng-class="{active: playbackRate === 3}" ng-click="setPlaybackRate(3)">3x</button>
+                        <button type="button" class="btn btn-default" ng-class="{active: playbackRate === 4}" ng-click="setPlaybackRate(4)">4x</button>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -155,8 +164,7 @@
 
                 <div style="display: table; width: 100%; background-color: black;">
                     <div style="display: table-row">
-                        <div 
-                             ng-if="selectedCameras.length > 0"
+                        <div ng-if="selectedCameras.length > 0"
                              class="video-container">
                             <span ng-if="!selectedCameras[0].currentRecord" class="no-record">Нет записи</span>
                             <div class="bubblingG" ng-if="selectedCameras[0].currentRecord && !selectedCameras[0].videoLoaded">
@@ -165,10 +173,9 @@
                                 <span class="bubblingG_3"></span>
                             </div>
                             <video autoplay style="{{selectedCameras[0].currentRecord ? 'visibility: visible' : 'visibility: hidden'}}"
-                                   ng-archive-video="selectedCameras[0]"></video>
+                                   ng-archive-video="selectedCameras[0]" playback-rate="playbackRate"></video>
                         </div>
-                        <div 
-                             ng-if="selectedCameras.length > 1"
+                        <div ng-if="selectedCameras.length > 1"
                              class="video-container">
                             <span ng-if="!selectedCameras[1].currentRecord" class="no-record">Нет записи</span>
                             <div class="bubblingG" ng-if="selectedCameras[1].currentRecord && !selectedCameras[1].videoLoaded">
@@ -177,7 +184,7 @@
                                 <span class="bubblingG_3"></span>
                             </div>
                             <video autoplay style="{{selectedCameras[1].currentRecord ? 'visibility: visible' : 'visibility: hidden'}}"
-                                   ng-archive-video="selectedCameras[1]"></video>
+                                   ng-archive-video="selectedCameras[1]" playback-rate="playbackRate"></video>
                         </div>
                     </div>
                     <div style="display: table-row"
@@ -190,10 +197,9 @@
                                 <span class="bubblingG_3"></span>
                             </div>
                             <video autoplay style="{{selectedCameras[2].currentRecord ? 'visibility: visible' : 'visibility: hidden'}}"
-                                   ng-archive-video="selectedCameras[2]"></video>
+                                   ng-archive-video="selectedCameras[2]" playback-rate="playbackRate"></video>
                         </div>
-                        <div 
-                             ng-if="selectedCameras.length > 3"
+                        <div ng-if="selectedCameras.length > 3"
                              class="video-container">
                             <span ng-if="!selectedCameras[3].currentRecord" class="no-record">Нет записи</span>
                             <div class="bubblingG" ng-if="selectedCameras[3].currentRecord && !selectedCameras[3].videoLoaded">
@@ -202,7 +208,7 @@
                                 <span class="bubblingG_3"></span>
                             </div>
                             <video autoplay style="{{selectedCameras[3].currentRecord ? 'visibility: visible' : 'visibility: hidden'}}"
-                                   ng-archive-video="selectedCameras[3]"></video>
+                                   ng-archive-video="selectedCameras[3]" playback-rate="playbackRate"></video>
                         </div>
                     </div>
                 </div>
@@ -218,13 +224,14 @@
                             </a>
                         </div>-->
                         <div class="arrow" drag-container="true" drag-data="'left'">
-                            <div class="left"></div>
+                            <div class="right"></div>
                         </div>
                         <div class="line" ng-click="progressClicked($event)" drop-container on-drop="onDrop($event, $dragData)">
                             <!--<img class="slider" src="/static/images/slider.png">-->
                             <div class="events-list-line" ng-if="timeInterval">
                                 <span ng-repeat="record in selectedCameraRef.records"
-                                      style="position: absolute; background-color: lightgreen; z-index: -1; top: -5px; height: 20px; width: {{60*10*1000*100/timeInterval}}%;left: {{calculateRecordPosition(record)}}%">
+                                      class="record"
+                                      style="width:{{60*10*1000*100/timeInterval}}%;left:{{calculateRecordPosition(record)}}%">
                                 </span>
 
                                 <span ng-repeat="event in selectedCameraRef.server.events | filter:cameraEventsFilter(selectedCameraRef.camera.id) track by $index"
@@ -236,9 +243,12 @@
                                 </span>
 
                             </div>
-                            
-                            <div ng-if="$first" style="z-index: 10px; width: 0px; border-left: 1px solid black; height: {{26 * selectedCameras.length +10}}px ; position: absolute; top: -10px; left: {{currentPlayerTimePercent}}%"></div>
-                            
+
+                            <div ng-if="$last" class="current-time-mark" style="top: {{15-19*selectedCameras.length}}px; height: {{19*selectedCameras.length}}px; left: {{currentPlayerTimePercent}}%">
+                                <div class="timestamp">{{currentPlaybackTime}}</div>
+                                <div class="arrow-up" style="top: {{19*selectedCameras.length - 19}}px"></div>
+                            </div>
+
                             <div class="timing" ng-if="$last">
                                 <div ng-repeat="timemark in timeMarks track by $index" class="timemark" style="left: {{$index*10}}%">
                                     <div class="time-tick"></div>
@@ -247,7 +257,10 @@
                             </div>
                         </div>
                         <div class="arrow" drag-container="true" drag-data="'right'">
-                            <div class="right"></div>
+                            <div class="left"></div>
+                        </div>
+                        <div class="download-btn" ng-click="downloadDialog(selectedCameraRef)">
+                            <span class="glyphicon glyphicon-download"></span>
                         </div>
                     </div>
                 </div>
@@ -288,7 +301,7 @@
                 </table>
                 <button class="btn btn-primary" style="margin:5px; background-color: #2b91ed; border-color: #2b91ed;" ng-if="isVideoOpened" ng-click="closeEventVideo()">Назад</button>
                 <div class="video-container" ng-if="isVideoOpened"
-                     ng-event-video="openedCameraRef" ng-event-opened="openedEvent"></div>
+                     ng-event-video="openedCameraRef" ng-event-opened="openedEvent" playback-rate="playbackRate"></div>
             </div>
         </div>
         <div class="slider-event-tools" ng-if="isEventFilterShow">
@@ -412,6 +425,27 @@
     </div>
 </section>
 
+
+<script type="text/ng-template" id="downloadRecords.html">
+    <div class="modal-header">
+        <h3 class="modal-title" id="modal-title">Записи камеры {{cameraRef.camera.name}}</h3>
+    </div>
+    <div class="modal-body" id="modal-body">
+        <table class="table table-striped records-table">
+            <thead><tr><th>Дата</th><th>Время</th><th></th></tr></thead>
+            <tbody>
+                <tr ng-repeat="record in cameraRef.records">
+                    <td>{{record.startTs | date: 'yyyy.MM.dd'}}</td>
+                    <td>{{record.startTs | date: 'HH:mm'}} - {{record.endTs | date: 'HH:mm'}}</td>
+                    <td><a href="{{record.src}}" download="video.mp4"><span class="glyphicon glyphicon-download"></span><span>Скачать {{Math.floor(100*record.fileSize/(1024*1024))/100}} Mb</span></a></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-primary" type="button" ng-click="close()">Закрыть</button>
+    </div>
+</script>
 
 <!-- section class="main">
     <div class="container clearfix">

@@ -4,7 +4,7 @@ angular.module('Constants', []);
 angular.module('Directives', []);
 angular.module('Filters', []);
 
-var module = angular.module('app', ['ui.router', 'ui.bootstrap.datetimepicker', 
+var module = angular.module('app', ['ui.router', 'ui.bootstrap.datetimepicker', 'ui.bootstrap.modal', 'uib/template/modal/window.html',
     'Constants', 'Services', 'Directives', 'Filters', 'ngSanitize']);
 
 module.controller('baseController', function($scope) {

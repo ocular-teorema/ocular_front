@@ -2,9 +2,7 @@
 angular
     .module('app')
     .controller('archiveController',
-        function ($scope, ArchiveService, $filter, $rootScope, EventsDescription, ServersService, $timeout, userCameras) {
-            //res.data.fact_address
-
+        function ($scope, ArchiveService, $filter, $rootScope, EventsDescription, ServersService, $timeout, userCameras, $uibModal) {
             var lastSeek = 0;
             $scope.eventsDescription = EventsDescription;
             $scope.recordsMode = 'archive';
@@ -13,12 +11,14 @@ angular
             $scope.servers = [];
             $scope.selectedCameras = [];
             $scope.loadArchiveVideosPending = false;
+            $scope.playbackRate = 1;
+            $scope.downloadCameraRef = null;
             $scope.toggleMode = function (mode) {
                 $scope.recordsMode = mode;
-                //if ($scope.recordsMode === 'archive' && $scope.loadArchiveVideosPending) {
-                //    for (var i = 0; i < $scope.servers.length; i++)
-                //        loadArchiveVideos($scope.servers[i], 0);
-                //}
+                if ($scope.recordsMode === 'archive' && $scope.loadArchiveVideosPending) {
+                    for (var i = 0; i < $scope.servers.length; i++)
+                        loadArchiveVideos($scope.servers[i], 0);
+                }
             };
 
             $scope.timeMarks = [];
@@ -93,11 +93,13 @@ angular
 
                                 for (var i = 0; i < resp.data.length; i++) {
                                     var record = resp.data[i];
-                                    record.src = 'http://' + cameraMap[record.cam].server.address + ':8080' + record.archivePostfix;
-                                    record.startTs = julianIntToDate(record.date);// - timezoneOffsetMs;
-                                    record.endTs = record.startTs + record.end;
-                                    record.startTs += record.start;
-                                    cameraMap[resp.data[i].cam].records.push(resp.data[i]);
+                                    if (record.fileSize > 0) {
+                                        record.src = 'http://' + cameraMap[record.cam].server.address + ':8080' + record.archivePostfix;
+                                        record.startTs = julianIntToDate(record.date);// - timezoneOffsetMs;
+                                        record.endTs = record.startTs + record.end;
+                                        record.startTs += record.start;
+                                        cameraMap[resp.data[i].cam].records.push(record);
+                                    }
                                 }
 
                                 $scope.seek(0);
@@ -333,23 +335,39 @@ angular
                 for (var i = 1; i < $scope.selectedCameras.length; i++) {
                     if ($scope.selectedCameras[i].video.readyState === 4) {
                         $scope.selectedCameras[i].video.currentTime = player.currentTime;
-                        $scope.selectedCameras[i].video.play();
+                        try {
+                            if ($scope.playbackRate > 0)
+                                $scope.selectedCameras[i].video.play();
+                        } catch (e) {
+                            console.log(e);
+                        }
                     }
                 }
 
                 if (!player.paused) {
                     requestAnimationFrame(sync);
                 }
-            };
+            }
 
             var onPlay = function () {
-                for (var i = 1; i < $scope.selectedCameras.length; i++)
-                    $scope.selectedCameras[i].video.play();
+                for (var i = 1; i < $scope.selectedCameras.length; i++) {
+                    try {
+                        $scope.selectedCameras[i].video.play();
+                    } catch (e) {
+                        console.log(e);
+                    }
+                }
+
                 sync();
             };
             var onPause = function () {
-                for (var i = 1; i < $scope.selectedCameras.length; i++)
-                    $scope.selectedCameras[i].video.pause();
+                for (var i = 1; i < $scope.selectedCameras.length; i++) {
+                    try {
+                        $scope.selectedCameras[i].video.pause();
+                    } catch (e) {
+                        console.log(e);
+                    }
+                }
             };
             var onTimeUpdate = function () {
                 if (this.paused) {
@@ -362,7 +380,12 @@ angular
             var onSeeking = function () {
                 for (var i = 1; i < $scope.selectedCameras.length; i++) {
                     $scope.selectedCameras[i].video.currentTime = this.currentTime;
-                    $scope.selectedCameras[i].video.play();
+                    try {
+                        if ($scope.playbackRate > 0)
+                            $scope.selectedCameras[i].video.play();
+                    } catch (e) {
+                        console.log(e);
+                    }
                 }
                 $scope.currentPlayerTimePercent = $scope.calculateCurrentPlaybackPercent();
                 $scope.$apply();
@@ -389,6 +412,8 @@ angular
                 }
                 if (!currentRecord)
                     return 0;
+                $scope.currentPlaybackTime = $filter('date')(new Date(currentRecord.startTs + video.currentTime * 1000), 'HH:mm:ss');
+
                 return Math.floor(100 * (video.currentTime * 1000 + currentRecord.startTs - $scope.interval.startDate.getTime()) / $scope.timeInterval);
             };
 
@@ -402,6 +427,7 @@ angular
                     cameraRef.currentRecord = null;
                     cameraRef.videoLoaded = false;
                     setTimeout(function () {
+                        $scope.selectedCameras[0].video.playbackRate = $scope.playbackRate;
                         $scope.selectedCameras[0].video.addEventListener("play", onPlay);
                         $scope.selectedCameras[0].video.addEventListener("pause", onPause);
                         $scope.selectedCameras[0].video.addEventListener("timeupdate", onTimeUpdate);
@@ -514,13 +540,20 @@ angular
                     //});
                     //player.currentTime = lastTime;
                     player.currentTime = event.offset;
-                    player.play();
+                    try {
+                        if ($scope.playbackRate > 0)
+                            element[0].play();
+                        else
+                            element[0].pause();
+                    } catch (e) {
+                        console.log(e);
+                    }
                     $scope.$apply();
                 };
                 if (event) {
                     player.src = src + event.archiveStartHint;
                 }
-                cameraRef.video = player;
+                cameraRef.eventVideo = player;
 
             };
 
@@ -548,6 +581,23 @@ angular
                 $scope.seek(Math.floor((endTs - startTs) * ($event.clientX - rect.left) / rect.width));
             };
 
+            $scope.downloadDialog = function (cameraRef) {
+                //$scope.downloadCameraRef = cameraRef;
+                var modalInstance = $uibModal.open({
+                    ariaLabelledBy: 'modal-title',
+                    ariaDescribedBy: 'modal-body',
+                    templateUrl: 'downloadRecords.html',
+                    controllerAs: '$ctrl',
+                    controller: function ($scope) {
+                        $scope.Math = window.Math;
+                        $scope.cameraRef = cameraRef;
+                        $scope.close = function () {
+                            modalInstance.dismiss('cancel');
+                        };
+                    }
+                });
+            };
+
             $scope.onDrop = function ($event, $dragData) {
                 var rect = $event.currentTarget.getBoundingClientRect();
                 var startTs = $scope.interval.startDate.getTime();
@@ -561,8 +611,11 @@ angular
                 }
             };
 
+            $scope.setPlaybackRate = function (rate) {
+                $scope.playbackRate = rate;
+            };
+
             $scope.seek = function (relativeMs) {
-                debugger;
                 var absoluteMs = $scope.interval.startDate.getTime() + relativeMs;
                 var earliestTs = null;
                 var atLeastOneFound = false;
@@ -572,7 +625,12 @@ angular
                         atLeastOneFound = true;
                         earliestTs = absoluteMs;
                         cameraRef.video.currentTime = Math.floor((absoluteMs - cameraRef.currentRecord.startTs) / 10) / 100;
-                        cameraRef.video.play();
+                        try {
+                            if ($scope.playbackRate > 0)
+                                cameraRef.video.play();
+                        } catch (e) {
+                            console.log(e);
+                        }
                     } else {
                         cameraRef.videoLoaded = false;
                         var found = false;
@@ -598,7 +656,13 @@ angular
                     }
                 }
                 var percent = $scope.calculateCurrentPlaybackPercent();
-                $scope.currentPlayerTimePercent = percent || 100 * relativeMs / $scope.timeInterval;
+                if (percent) {
+                    $scope.currentPlayerTimePercent = percent;
+                } else {
+                    $scope.currentPlayerTimePercent = 100 * relativeMs / $scope.timeInterval;
+                    $scope.currentPlaybackTime = $filter('date')(new Date(absoluteMs), 'HH:mm:ss');
+                }
+
                 if (!atLeastOneFound && earliestTs !== null) {
                     $scope.seek(earliestTs - $scope.interval.startDate.getTime());
                 }
@@ -612,7 +676,8 @@ angular
                 'restrict': 'A',
                 'scope': {
                     ngEventVideo: '=',
-                    ngEventOpened: '='
+                    ngEventOpened: '=',
+                    playbackRate: '='
                 },
                 'controller': function ($scope) {
 
@@ -625,29 +690,49 @@ angular
                     $scope.$watch('ngEventVideo', function (newV, oldV) {
                         if (newV === oldV)
                             return;
-                        if (oldV.video) {
-                            angular.element(oldV.video).empty().remove();
+                        if (oldV.eventVideo) {
+                            angular.element(oldV.eventVideo).empty().remove();
                         }
                         iniContainer();
                     });
                     $scope.$watch('ngEventOpened', function (newV, oldV) {
                         if (newV === oldV)
                             return;
-                        if ($scope.ngEventVideo.video) {
-                            angular.element($scope.ngEventVideo.video).empty().remove();
+                        if ($scope.ngEventVideo.eventVideo) {
+                            angular.element($scope.ngEventVideo.eventVideo).empty().remove();
                         }
                         iniContainer();
                     });
+
+                    $scope.$watch('playbackRate', function (newV, oldV) {
+                        if (newV === oldV)
+                            return;
+                        if ($scope.playbackRate > 0) {
+                            element[0].playbackRate = $scope.playbackRate;
+                            if (element[0].paused) {
+                                try {
+                                    element[0].play();
+                                } catch (e) {
+                                    console.log(e);
+                                }
+                            }
+                        } else {
+                            element[0].pause();
+                        }
+
+                    });
+
                     iniContainer();
                 }
             };
-    })
+        })
     .directive('ngArchiveVideo',
         function () {
             return {
                 'restrict': 'A',
                 'scope': {
-                    ngArchiveVideo: '='
+                    ngArchiveVideo: '=',
+                    playbackRate: '='
                 },
                 'controller': function ($scope) {
                 },
@@ -656,7 +741,15 @@ angular
                     $scope.ngArchiveVideo.videoLoaded = false;
                     element[0].onloadedmetadata = function () {
                         $scope.ngArchiveVideo.videoLoaded = true;
-                        element[0].play();
+                        element[0].playbackRate = $scope.playbackRate;
+                        try {
+                            if ($scope.playbackRate > 0)
+                                element[0].play();
+                            else
+                                element[0].pause();
+                        } catch (e) {
+                            console.log(e);
+                        }
                     };
 
                     $scope.$watch('ngArchiveVideo', function (newV, oldV) {
@@ -664,6 +757,32 @@ angular
                             return;
                         $scope.ngArchiveVideo.videoLoaded = false;
                         $scope.ngArchiveVideo.video = element[0];
+                        try {
+                            if ($scope.playbackRate > 0)
+                                element[0].play();
+                            else
+                                element[0].pause();
+                        } catch (e) {
+                            console.log(e);
+                        }
+                    });
+
+                    $scope.$watch('playbackRate', function (newV, oldV) {
+                        if (newV === oldV)
+                            return;
+                        if ($scope.playbackRate > 0) {
+                            element[0].playbackRate = $scope.playbackRate;
+                            if (element[0].paused) {
+                                try {
+                                    element[0].play();
+                                } catch (e) {
+                                    console.log(e);
+                                }
+                            }
+                        } else {
+                            element[0].pause();
+                        }
+
                     });
                 }
             };
