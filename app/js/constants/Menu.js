@@ -8,10 +8,10 @@ module.constant('Menu', [
         "ROUTE": "main.base.archive",
         "TITLE": "Архив"
     },
-    {
+/*    {
         "ROUTE": "main.base.records",
         "TITLE": "Старый Архив"
-    },
+    },*/
     {
         "ROUTE": "main.administration.base",
         "TITLE": "Управление",

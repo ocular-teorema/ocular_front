@@ -69,7 +69,7 @@ module.config(function ($stateProvider, $locationProvider, $urlRouterProvider) {
                 }
             }
         })
-        .state('main.base.records', {
+/*        .state('main.base.records', {
             url: '/records',
             templateUrl: templatesPath + 'pages/records.html',
             controller: 'recordsController',
@@ -89,7 +89,7 @@ module.config(function ($stateProvider, $locationProvider, $urlRouterProvider) {
                 );
                 return defer.promise;
             }
-        })
+        })*/
         .state('main.base.recordsPlayer', {
             url: '/records/player?:post&:filters&:speed',
             templateUrl: templatesPath + 'pages/records/player.html',
