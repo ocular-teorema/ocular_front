@@ -437,7 +437,7 @@
                 <tr ng-repeat="record in cameraRef.records">
                     <td>{{record.startTs | date: 'yyyy.MM.dd'}}</td>
                     <td>{{record.startTs | date: 'HH:mm'}} - {{record.endTs | date: 'HH:mm'}}</td>
-                    <td><a href="{{record.src}}" download="video.mp4"><span class="glyphicon glyphicon-download"></span><span>Скачать {{Math.floor(100*record.fileSize/(1024*1024))/100}} Mb</span></a></td>
+                    <td><a href="{{'http://' + cameraRef.server.address + ':8080/download' + record.archivePostfix}}" download="video.mp4"><span class="glyphicon glyphicon-download"></span><span>Скачать {{Math.floor(100*record.fileSize/(1024*1024))/100}} Mb</span></a></td>
                 </tr>
             </tbody>
         </table>
