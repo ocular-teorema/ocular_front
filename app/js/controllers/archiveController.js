@@ -12,6 +12,7 @@ angular
             $scope.selectedCameras = [];
             $scope.loadArchiveVideosPending = false;
             $scope.playbackRate = 1;
+            $scope.playbackInitialized = false;
             $scope.downloadCameraRef = null;
             $scope.toggleMode = function (mode) {
                 $scope.recordsMode = mode;
@@ -330,10 +331,10 @@ angular
             // With requestAnimationFrame, we can ensure that as 
             // frequently as the browser would allow, 
             // the video is resync'ed.
-            function sync() {
+            $scope.sync = function () {
                 var player = $scope.selectedCameras[0].video;
                 for (var i = 1; i < $scope.selectedCameras.length; i++) {
-                    if ($scope.selectedCameras[i].video.readyState === 4) {
+                    if ($scope.selectedCameras[i].video && $scope.selectedCameras[i].video.readyState === 4) {
                         $scope.selectedCameras[i].video.currentTime = player.currentTime;
                         try {
                             if ($scope.playbackRate > 0)
@@ -345,7 +346,7 @@ angular
                 }
 
                 if (!player.paused) {
-                    requestAnimationFrame(sync);
+                    requestAnimationFrame($scope.sync);
                 }
             }
 
@@ -358,7 +359,7 @@ angular
                     }
                 }
 
-                sync();
+                $scope.sync();
             };
             var onPause = function () {
                 for (var i = 1; i < $scope.selectedCameras.length; i++) {
@@ -422,18 +423,22 @@ angular
                     $scope.selectedCameras[i].video.currentTime = val;
             };
 
+            $scope.initPlayback = function () {
+                if (!$scope.playbackInitialized) {
+                    $scope.selectedCameras[0].video.addEventListener("play", onPlay);
+                    $scope.selectedCameras[0].video.addEventListener("pause", onPause);
+                    $scope.selectedCameras[0].video.addEventListener("timeupdate", onTimeUpdate);
+                    $scope.selectedCameras[0].video.addEventListener("seeking", onSeeking);
+                    $scope.selectedCameras[0].video.addEventListener("ended", onEnded);
+                    $scope.playbackInitialized = true;
+                }
+            }
+
             $scope.setCameraModel = function (camera, values, cameraRef, oldCamera, addNew) {
                 function initCamera(cameraRef) {
                     cameraRef.currentRecord = null;
                     cameraRef.videoLoaded = false;
                     setTimeout(function () {
-                        $scope.selectedCameras[0].video.playbackRate = $scope.playbackRate;
-                        $scope.selectedCameras[0].video.addEventListener("play", onPlay);
-                        $scope.selectedCameras[0].video.addEventListener("pause", onPause);
-                        $scope.selectedCameras[0].video.addEventListener("timeupdate", onTimeUpdate);
-                        $scope.selectedCameras[0].video.addEventListener("seeking", onSeeking);
-                        $scope.selectedCameras[0].video.addEventListener("ended", onEnded);
-
                         loadStats(cameraRef.server);
                         loadArchiveVideos(cameraRef.server, 0);
                         loadEvents(cameraRef.server, 0);
@@ -542,9 +547,9 @@ angular
                     player.currentTime = event.offset;
                     try {
                         if ($scope.playbackRate > 0)
-                            element[0].play();
+                            player.play();
                         else
-                            element[0].pause();
+                            player.pause();
                     } catch (e) {
                         console.log(e);
                     }
@@ -737,34 +742,31 @@ angular
                 'controller': function ($scope) {
                 },
                 'link': function ($scope, element) {
-                    $scope.ngArchiveVideo.video = element[0];
-                    $scope.ngArchiveVideo.videoLoaded = false;
-                    element[0].onloadedmetadata = function () {
-                        $scope.ngArchiveVideo.videoLoaded = true;
-                        element[0].playbackRate = $scope.playbackRate;
-                        try {
-                            if ($scope.playbackRate > 0)
-                                element[0].play();
-                            else
-                                element[0].pause();
-                        } catch (e) {
-                            console.log(e);
-                        }
-                    };
+                    function initVideo() {
+                        $scope.ngArchiveVideo.video = element[0];
+                        $scope.ngArchiveVideo.videoLoaded = false;
+                        
+                        element[0].onloadedmetadata = function () {
+                            $scope.ngArchiveVideo.videoLoaded = true;
+                            element[0].playbackRate = $scope.playbackRate;
+                            try {
+                                if ($scope.playbackRate > 0)
+                                    element[0].play();
+                                else
+                                    element[0].pause();
+                            } catch (e) {
+                                console.log(e);
+                            }
+                        };
+                        $scope.$parent.initPlayback();
+                    }
+
+                    initVideo();
 
                     $scope.$watch('ngArchiveVideo', function (newV, oldV) {
                         if (newV === oldV)
                             return;
-                        $scope.ngArchiveVideo.videoLoaded = false;
-                        $scope.ngArchiveVideo.video = element[0];
-                        try {
-                            if ($scope.playbackRate > 0)
-                                element[0].play();
-                            else
-                                element[0].pause();
-                        } catch (e) {
-                            console.log(e);
-                        }
+                        initVideo();
                     });
 
                     $scope.$watch('playbackRate', function (newV, oldV) {
@@ -775,6 +777,7 @@ angular
                             if (element[0].paused) {
                                 try {
                                     element[0].play();
+                                    $scope.$parent.sync();
                                 } catch (e) {
                                     console.log(e);
                                 }
