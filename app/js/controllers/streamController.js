@@ -11,8 +11,15 @@ module.controller('streamController', function (
     $sce
 ) {
 
+    var localStorage = window.localStorage || {};
+
+    $scope.vm = { 
+        camerasQuadrator: camerasQuadrators.data[0],
+        confidence: (localStorage['dangerLavel'] ? localStorage['dangerLavel'] : 0),
+        selectedCamera: false
+    };
+
     $scope.quadratorsList = camerasQuadrators.data;
-    $scope.camerasQuadrator = camerasQuadrators.data[0];
 
     var startServerDateTime = new Date(camerasQuadrators.headers('date')).getTime(),
         startLocalDateTime = new Date().getTime();
@@ -39,12 +46,12 @@ module.controller('streamController', function (
     var checkQuadratorSize = function () {
         var minRangeResolution = 10;
 
-        var currentResolution = $scope.camerasQuadrator
-            ? $scope.camerasQuadrator.output_width / $scope.camerasQuadrator.num_cam_x / ($scope.camerasQuadrator.output_height / $scope.camerasQuadrator.num_cam_y)
+        var currentResolution = $scope.vm.camerasQuadrator
+            ? $scope.vm.camerasQuadrator.output_width / $scope.vm.camerasQuadrator.num_cam_x / ($scope.vm.camerasQuadrator.output_height / $scope.vm.camerasQuadrator.num_cam_y)
             : 1;
 
-        $scope.camSizeX = $scope.camerasQuadrator ? 100 / $scope.camerasQuadrator.num_cam_x : 100;
-        $scope.camSizeY = $scope.camerasQuadrator ? 100 / $scope.camerasQuadrator.num_cam_y : 100;
+        $scope.camSizeX = $scope.vm.camerasQuadrator ? 100 / $scope.vm.camerasQuadrator.num_cam_x : 100;
+        $scope.camSizeY = $scope.vm.camerasQuadrator ? 100 / $scope.vm.camerasQuadrator.num_cam_y : 100;
 
         resolutions.forEach(function (resolution) {
             var newResolution = Math.abs(resolution.values[0] / resolution.values[1] - currentResolution);
@@ -56,8 +63,8 @@ module.controller('streamController', function (
 
         var sizesOfScreen = $scope.selectedSize.split('x');
         svgSizes = {
-            w: ($scope.camerasQuadrator ? $scope.camerasQuadrator.num_cam_x : 1) * sizesOfScreen[0],
-            h: ($scope.camerasQuadrator ? $scope.camerasQuadrator.num_cam_y : 1) * sizesOfScreen[1]
+            w: ($scope.vm.camerasQuadrator ? $scope.vm.camerasQuadrator.num_cam_x : 1) * sizesOfScreen[0],
+            h: ($scope.vm.camerasQuadrator ? $scope.vm.camerasQuadrator.num_cam_y : 1) * sizesOfScreen[1]
         };
         $scope.svgImg = $sce.trustAsHtml('<svg xmlns="http://www.w3.org/2000/svg" ' +
             'viewBox="0 0 ' + svgSizes['w'] + " " + svgSizes['h'] + '" class="cameras-table-size_img" id="cameras-list-wrapper"></svg>');
@@ -118,11 +125,11 @@ module.controller('streamController', function (
     var checkLatestEvents = function (camera) {
         var oldLatestLength = camera.latestEvents.length;
         camera.latestEvents = camera.events.filter(function (eventData) {
-            return $scope.confidence <= eventData.confidence;
+            return $scope.vm.confidence <= eventData.confidence;
         });
 
         camera.noReactionEvents = camera.noReactionEvents.filter(function (eventData) {
-            return $scope.confidence <= eventData.confidence;
+            return $scope.vm.confidence <= eventData.confidence;
         });
 
         if (oldLatestLength < camera.latestEvents.length) {
@@ -151,7 +158,8 @@ module.controller('streamController', function (
         }
     };
 
-    $scope.$watch('camerasQuadrator', function (newQu, oldQu) {
+    $scope.$watch('vm.camerasQuadrator', function (newQu, oldQu) {
+        debugger;
         checkQuadratorSize();
         $scope.closeSelectedCamera();
         $scope.showVideoContainer = false;
@@ -160,19 +168,19 @@ module.controller('streamController', function (
         });
 
         resetEventsList(oldQu);
-        if ($scope.camerasQuadrator) {
-            WebSocketService.subscribe($scope.camerasQuadrator.cameras.filter(function (value, index, self) {
+        if ($scope.vm.camerasQuadrator) {
+            WebSocketService.subscribe($scope.vm.camerasQuadrator.cameras.filter(function (value, index, self) {
                 return self.indexOf(value) === index;
             }).map(function (cam) {
                 return cam.camera_id;
             }), function (eventData) {
-                if (!$scope.camerasQuadrator)
+                if (!$scope.vm.camerasQuadrator)
                     return;
                 var cameras = [];
 
-                for (var row = 0; row < $scope.camerasQuadrator.num_cam_y; row++)
-                    for (var col = 0; col < $scope.camerasQuadrator.num_cam_x; col++) {
-                        var cell = $scope.camerasQuadrator.cells[row][col];
+                for (var row = 0; row < $scope.vm.camerasQuadrator.num_cam_y; row++)
+                    for (var col = 0; col < $scope.vm.camerasQuadrator.num_cam_x; col++) {
+                        var cell = $scope.vm.camerasQuadrator.cells[row][col];
                         if (cell.camera && cell.camera.id === eventData.camera_id)
                             cameras.push(cell.camera);
                     }
@@ -192,7 +200,7 @@ module.controller('streamController', function (
                                 return event.id !== eventData.id;
                             });
 
-                            if (eventData.reaction === '-1' && $scope.confidence <= eventData.confidence) {
+                            if (eventData.reaction === '-1' && $scope.vm.confidence <= eventData.confidence) {
                                 camera.noReactionEvents.push(eventData);
                             }
                         }
@@ -311,29 +319,23 @@ module.controller('streamController', function (
     };
 
     $scope.setSelectedCamera = function (camera) {
-        $scope.selectedCamera = camera;
+        $scope.vm.selectedCamera = camera;
         $timeout(function () {
             $scope.iniSvgMask();
         });
     };
 
     $scope.closeSelectedCamera = function () {
-        $scope.selectedCamera = false;
+        $scope.vm.selectedCamera = false;
         $timeout(function () {
             $scope.iniSvgMask();
         });
     };
 
-    var localStorage = window.localStorage || {};
-
-    $scope.confidence = localStorage['dangerLavel']
-        ? localStorage['dangerLavel']
-        : 0;
-
     $scope.onSelectDanger = function (value) {
-        for (var row = 0; row < $scope.camerasQuadrator.num_cam_y; row++)
-            for (var col = 0; col < $scope.camerasQuadrator.num_cam_x; col++) {
-                var cell = $scope.camerasQuadrator.cells[row][col];
+        for (var row = 0; row < $scope.vm.camerasQuadrator.num_cam_y; row++)
+            for (var col = 0; col < $scope.vm.camerasQuadrator.num_cam_x; col++) {
+                var cell = $scope.vm.camerasQuadrator.cells[row][col];
                 if (cell && cell.camera)
                     checkLatestEvents(cell.camera);
             }
