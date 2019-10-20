@@ -226,6 +226,15 @@
         .camera-choose-box--group {
             margin-right: 0;
         }
+
+        .dropdown-menu {
+            width: 284px;
+            margin-left: -10px;
+            .datetimepicker {
+                width: 280px;
+                border: none;
+            }
+        }
     }
 }
 
