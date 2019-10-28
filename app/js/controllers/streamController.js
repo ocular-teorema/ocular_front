@@ -159,7 +159,6 @@ module.controller('streamController', function (
     };
 
     $scope.$watch('vm.camerasQuadrator', function (newQu, oldQu) {
-        debugger;
         checkQuadratorSize();
         $scope.closeSelectedCamera();
         $scope.showVideoContainer = false;
@@ -172,7 +171,7 @@ module.controller('streamController', function (
             WebSocketService.subscribe($scope.vm.camerasQuadrator.cameras.filter(function (value, index, self) {
                 return self.indexOf(value) === index;
             }).map(function (cam) {
-                return cam.camera_id;
+                return cam.unique_ID;
             }), function (eventData) {
                 if (!$scope.vm.camerasQuadrator)
                     return;
