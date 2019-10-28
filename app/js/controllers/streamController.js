@@ -111,7 +111,7 @@ module.controller('streamController', function (
                     quadrator.cells[cameraInQuadrator.y + h][cameraInQuadrator.x + l].hidden = l !== 0 || h !== 0;
             cell.params = cameraInQuadrator;
             cell.camera = camerasList.data.filter(function (camera) {
-                return camera.id === cameraInQuadrator.camera_id;
+                return camera.unique_id === cameraInQuadrator.unique_id;
             })[0];
             cell.camera['analysis-icon'] = types[cell.camera.analysis - 1];
             cell.camera['noReactionEvents'] = [];
@@ -171,7 +171,7 @@ module.controller('streamController', function (
             WebSocketService.subscribe($scope.vm.camerasQuadrator.cameras.filter(function (value, index, self) {
                 return self.indexOf(value) === index;
             }).map(function (cam) {
-                return cam.unique_ID;
+                return cam.unique_id;
             }), function (eventData) {
                 if (!$scope.vm.camerasQuadrator)
                     return;
@@ -180,7 +180,7 @@ module.controller('streamController', function (
                 for (var row = 0; row < $scope.vm.camerasQuadrator.num_cam_y; row++)
                     for (var col = 0; col < $scope.vm.camerasQuadrator.num_cam_x; col++) {
                         var cell = $scope.vm.camerasQuadrator.cells[row][col];
-                        if (cell.camera && cell.camera.id === eventData.camera_id)
+                        if (cell.camera && cell.camera.unique_id === eventData.camera_id)
                             cameras.push(cell.camera);
                     }
 
@@ -220,7 +220,7 @@ module.controller('streamController', function (
         if (!camera.events) return;
         WebSocketService.sendReaction({
             reaction: reaction,
-            camera_id: camera.id,
+            camera_id: camera.unique_id,
             id: camera.events[camera.events.length - 1].id
         });
     };
