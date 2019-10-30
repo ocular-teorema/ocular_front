@@ -244,7 +244,7 @@
                                       style="width:{{60*10*1000*100/timeInterval}}%;left:{{calculateRecordPosition(record)}}%">
                                 </span>
 
-                                <span ng-repeat="event in selectedCameraRef.server.events | filter:cameraEventsFilter(selectedCameraRef.camera.id) track by $index"
+                                <span ng-repeat="event in selectedCameraRef.server.events | filter:cameraEventsFilter(selectedCameraRef.camera.unique_id) track by $index"
                                       class="event line-e"
                                       ng-style="{left: calculateEventPosition(event) + '%'}"
                                       ng-class="eventConfidenceClass(event)">

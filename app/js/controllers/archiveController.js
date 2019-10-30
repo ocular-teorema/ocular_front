@@ -29,8 +29,8 @@ angular
                 var selectedCameras = $scope.selectedCameras.filter(function (sc) { return sc.camera.server === server.id; });
                 if (selectedCameras.length > 0) {
                     var selectedRefs = selectedCameras
-                        .filter(function (cameraRef) { return cameraRef.camera && cameraRef.camera.id; })
-                        .map(function (cameraRef) { return cameraRef.camera.id; });
+                        .filter(function (cameraRef) { return cameraRef.camera && cameraRef.camera.unique_id; })
+                        .map(function (cameraRef) { return cameraRef.camera.unique_id; });
                     server.loadingStats = true;
                     if (selectedRefs.length > 0) {
                         var startTs = $scope.interval.startDate.getTime();
@@ -75,8 +75,8 @@ angular
                             }
                         }
                         var selectedRefs = selectedCameras
-                            .filter(function (cameraRef) { return cameraRef.camera && cameraRef.camera.id; })
-                            .map(function (cameraRef) { return cameraRef.camera.id; });
+                            .filter(function (cameraRef) { return cameraRef.camera && cameraRef.camera.unique_id; })
+                            .map(function (cameraRef) { return cameraRef.camera.unique_id; });
                         if (selectedRefs.length > 0) {
                             server.loadingEventVideos = false;
                             ArchiveService.getArchiveVideos(
@@ -88,7 +88,7 @@ angular
                             ).then(function (resp) {
                                 var cameraMap = {};
                                 for (var c = 0; c < $scope.selectedCameras.length; c++) {
-                                    cameraMap['cam' + $scope.selectedCameras[c].camera.id] = $scope.selectedCameras[c];
+                                    cameraMap['cam' + $scope.selectedCameras[c].camera.unique_id] = $scope.selectedCameras[c];
                                     $scope.selectedCameras[c].records = [];
                                 }
 
@@ -120,8 +120,8 @@ angular
                 var selectedCameras = $scope.selectedCameras.filter(function (sc) { return sc.camera.server === server.id; });
                 if (selectedCameras.length > 0) {
                     var selectedRefs = selectedCameras
-                        .filter(function (cameraRef) { return cameraRef.camera && cameraRef.camera.id; })
-                        .map(function (cameraRef) { return cameraRef.camera.id; });
+                        .filter(function (cameraRef) { return cameraRef.camera && cameraRef.camera.unique_id; })
+                        .map(function (cameraRef) { return cameraRef.camera.unique_id; });
                     if (selectedRefs.length > 0) {
                         server.loadingEvents = true;
                         ArchiveService.getEvents(
@@ -348,7 +348,7 @@ angular
                 if (!player.paused) {
                     requestAnimationFrame($scope.sync);
                 }
-            }
+            };
 
             var onPlay = function () {
                 for (var i = 1; i < $scope.selectedCameras.length; i++) {
@@ -432,7 +432,7 @@ angular
                     $scope.selectedCameras[0].video.addEventListener("ended", onEnded);
                     $scope.playbackInitialized = true;
                 }
-            }
+            };
 
             $scope.setCameraModel = function (camera, values, cameraRef, oldCamera, addNew) {
                 function initCamera(cameraRef) {
@@ -564,7 +564,7 @@ angular
 
             $scope.openEventVideo = function (event) {
                 $scope.isVideoOpened = true;
-                $scope.openedCameraRef = $scope.selectedCameras.filter(function (cr) { return 'cam' + cr.camera.id === event.cam; })[0];
+                $scope.openedCameraRef = $scope.selectedCameras.filter(function (cr) { return 'cam' + cr.camera.unique_id === event.cam; })[0];
                 $scope.openedEvent = event;
             };
 
@@ -573,7 +573,7 @@ angular
             };
 
             $scope.getCamera = function (eventCamId) {
-                var cameraRef = $scope.selectedCameras.filter(function (cr) { return 'cam' + cr.camera.id === eventCamId; })[0];
+                var cameraRef = $scope.selectedCameras.filter(function (cr) { return 'cam' + cr.camera.unique_id === eventCamId; })[0];
                 if (cameraRef && cameraRef.camera)
                     return cameraRef.camera;
                 return null;
