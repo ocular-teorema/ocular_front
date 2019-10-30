@@ -248,7 +248,7 @@ module.controller('streamController', function (
                 'http://' +
                 parser.hostname +
                 ':8080/cam' +
-                camera['id'] +
+                camera['unique_id'] +
                 '/alertFragments/alert' +
                 event.id +
                 '.mp4'
