@@ -41,7 +41,6 @@ module.controller('streamController', function (
         }
     ];
 
-
     var svgSizes;
     var checkQuadratorSize = function () {
         var minRangeResolution = 10;
@@ -144,8 +143,11 @@ module.controller('streamController', function (
         }
     };
 
+    var viewSelected;
+
     var resetEventsList = function (camerasQuadrator) {
-        if (camerasQuadrator && camerasQuadrator.cells && camerasQuadrator.cells.length) {
+        viewSelected = camerasQuadrator.id;
+        if (camerasQuadrator.cells.length) {
             for (var row = 0; row < camerasQuadrator.num_cam_y; row++)
                 for (var col = 0; col < camerasQuadrator.num_cam_x; col++) {
                     var cell = camerasQuadrator.cells[row][col];
@@ -158,7 +160,15 @@ module.controller('streamController', function (
         }
     };
 
-    $scope.$watch('vm.camerasQuadrator', function (newQu, oldQu) {
+    var sendViewSelected = function() {
+        WebSocketService.sendReaction({
+            quad_id: viewSelected,
+        });
+        $timeout(sendViewSelected, 5000);
+    }
+    sendViewSelected();
+
+    $scope.$watch('camerasQuadrator', function (newQu, oldQu) {
         checkQuadratorSize();
         $scope.closeSelectedCamera();
         $scope.showVideoContainer = false;
