@@ -143,7 +143,7 @@ module.controller('streamController', function (
         }
     };
 
-    var viewSelected;
+    var viewSelected = 1;
 
     var resetEventsList = function (camerasQuadrator) {
         viewSelected = camerasQuadrator.id;
@@ -160,15 +160,27 @@ module.controller('streamController', function (
         }
     };
 
-    var sendViewSelected = function() {
+    $scope.onSelectViewMap = function (value) {
+        viewSelected = value.id;
+    };
+
+    var currentPinger;
+    var sendViewSelected = function() {        
         WebSocketService.sendReaction({
             quad_id: viewSelected,
         });
-        $timeout(sendViewSelected, 5000);
+        currentPinger = $timeout(sendViewSelected, 30000);
     }
-    sendViewSelected();
 
-    $scope.$watch('camerasQuadrator', function (newQu, oldQu) {
+    WebSocketService.addOnConnectHandler(function() {
+        if (currentPinger) {
+            $timeout.cancel(currentPinger);
+        }
+        sendViewSelected();
+    });
+
+    $scope.$watch('vm.camerasQuadrator', function (newQu, oldQu) {
+        console.log('camerasQuadrator watch')
         checkQuadratorSize();
         $scope.closeSelectedCamera();
         $scope.showVideoContainer = false;
@@ -177,6 +189,7 @@ module.controller('streamController', function (
         });
 
         resetEventsList(oldQu);
+
         if ($scope.vm.camerasQuadrator) {
             WebSocketService.subscribe($scope.vm.camerasQuadrator.cameras.filter(function (value, index, self) {
                 return self.indexOf(value) === index;

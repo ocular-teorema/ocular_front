@@ -2,7 +2,7 @@ var module = angular.module('Services');
 module.service('WebSocketService', function($location) {
 
     // var port = '';
-    // var host = '78.46.97.176';
+    // var host = '80.254.48.93';
 
     var host = $location.$$host;
     var port = $location.$$port ? ':' + $location.$$port : '';
@@ -15,7 +15,7 @@ module.service('WebSocketService', function($location) {
     var openedClient;
     var openCallback;
     var latestSubscription;
-
+    var onConnectCb;
 
     var subscribe = function(ids, callback) {
         latestSubscription = {
@@ -42,6 +42,7 @@ module.service('WebSocketService', function($location) {
         client.onopen = function() {
             openedClient = true;
             openCallback ? openCallback() : false;
+            onConnectCb ? onConnectCb() : false;
         };
         if (!latestSubscription) return;
         subscribe(latestSubscription.ids, latestSubscription.callback);
@@ -49,8 +50,12 @@ module.service('WebSocketService', function($location) {
 
     reconnectWS();
 
+    var addOnConnectHandler = function(cb) {
+        onConnectCb = cb;
+    }
 
     return {
+        addOnConnectHandler: addOnConnectHandler,
         subscribe: subscribe,
         unsubscribe: function() {
             client.onmessage = undefined;
