@@ -143,7 +143,7 @@ module.controller('streamController', function (
         }
     };
 
-    var viewSelected = 1;
+    var viewSelected;
 
     var resetEventsList = function (camerasQuadrator) {
         viewSelected = camerasQuadrator.id;
