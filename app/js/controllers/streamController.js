@@ -147,7 +147,7 @@ module.controller('streamController', function (
 
     var resetEventsList = function (camerasQuadrator) {
         viewSelected = camerasQuadrator.id;
-        if (camerasQuadrator.cells.length) {
+        if (camerasQuadrator && camerasQuadrator.cells && camerasQuadrator.cells.length) {
             for (var row = 0; row < camerasQuadrator.num_cam_y; row++)
                 for (var col = 0; col < camerasQuadrator.num_cam_x; col++) {
                     var cell = camerasQuadrator.cells[row][col];
