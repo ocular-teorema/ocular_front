@@ -143,10 +143,7 @@ module.controller('streamController', function (
         }
     };
 
-    var viewSelected;
-
     var resetEventsList = function (camerasQuadrator) {
-        viewSelected = camerasQuadrator.id;
         if (camerasQuadrator && camerasQuadrator.cells && camerasQuadrator.cells.length) {
             for (var row = 0; row < camerasQuadrator.num_cam_y; row++)
                 for (var col = 0; col < camerasQuadrator.num_cam_x; col++) {
@@ -160,27 +157,32 @@ module.controller('streamController', function (
         }
     };
 
-    $scope.onSelectViewMap = function (value) {
-        viewSelected = value.id;
-    };
-
     var currentPinger;
-    var sendViewSelected = function() {        
+    var ststusMsgConnect;
+    var sendMsgPing = function () { 
+
+        console.log('send guad_id:', $scope.vm.camerasQuadrator.id);
+
         WebSocketService.sendReaction({
-            quad_id: viewSelected,
+            quad_id: $scope.vm.camerasQuadrator.id,
         });
-        currentPinger = $timeout(sendViewSelected, 30000);
+
+        currentPinger = $timeout(sendMsgPing, 30000);
     }
 
-    WebSocketService.addOnConnectHandler(function() {
+    var sendViewSelected = function() {        
         if (currentPinger) {
             $timeout.cancel(currentPinger);
         }
+        sendMsgPing();
+    }
+
+    WebSocketService.addOnConnectHandler(function() {
         sendViewSelected();
+        ststusMsgConnect = true;
     });
 
     $scope.$watch('vm.camerasQuadrator', function (newQu, oldQu) {
-        console.log('camerasQuadrator watch')
         checkQuadratorSize();
         $scope.closeSelectedCamera();
         $scope.showVideoContainer = false;
@@ -189,6 +191,8 @@ module.controller('streamController', function (
         });
 
         resetEventsList(oldQu);
+
+        (ststusMsgConnect) ? sendViewSelected() : null;
 
         if ($scope.vm.camerasQuadrator) {
             WebSocketService.subscribe($scope.vm.camerasQuadrator.cameras.filter(function (value, index, self) {

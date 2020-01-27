@@ -69,7 +69,13 @@ module.directive('ngMsePlayer', function($timeout) {
                     if (!source) {
                         return;
                     }
-                    sourceBuffer.appendBuffer(source);
+                    try {
+                        sourceBuffer.appendBuffer(source);
+                    } catch (err) {
+                        console.log(err);
+                        client.close();
+                    }
+                    
                 };
 
                 client = new WebSocket($scope.ngMsePlayer.stream);
@@ -79,7 +85,12 @@ module.directive('ngMsePlayer', function($timeout) {
                     if (sourceBuffer.updating) {
                         sourcesData.push(event.data);
                     } else {
-                        sourceBuffer.appendBuffer(event.data);
+                        try {
+                            sourceBuffer.appendBuffer(event.data);
+                        } catch (err) {
+                            console.log(err);
+                            client.close();
+                        }
                     }
 
                     if (!startTimes) {
