@@ -36,6 +36,18 @@
                                 </label>
                             </div>
                         </div>
+
+                        <div class="form-field form-field--required form-field--required--select form-field--required--select--fullwidth">
+                            <label>
+                                Разрешение <br>
+                                <div ng-select
+                                    ng-model="selectedQuadResolution"
+                                    ng-model-list="quadResolutions"
+                                    ng-select-options="{class: 'select-3', label: 'size'}">
+                                </div>
+                            </label>
+                        </div>
+
                         <div class="form-field form-field--required form-field--required--select form-field--required--select--fullwidth">
                             <label>
                                 Соотношение сторон отображения камер <br>

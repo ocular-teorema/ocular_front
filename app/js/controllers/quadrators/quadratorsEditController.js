@@ -200,10 +200,35 @@ module.controller('quadratorsEditController', function ($scope, QuadratorsServic
 
 
     $scope.qualityList = [21, 22, 23, 24, 25, 26, 27];
+    
 
+
+    $scope.quadResolutions = [
+        {
+            size: '1080x720',
+            values: [1080, 720]
+        }, {
+            size: '1920x1080',
+            values: [1920,1080]
+        }
+    ];
 
     var maxStreamWidth = 1920;
     var maxStreamHeight = 1080;
+    console.log(maxStreamWidth,maxStreamHeight);
+
+    $scope.$watch('selectedQuadResolution', function (newVal, oldVal) {
+        console.log(newVal)
+        maxStreamWidth = newVal.values[0];
+        maxStreamHeight = newVal.values[1];
+
+        console.log(maxStreamWidth,maxStreamHeight);
+    });
+
+    // var maxStreamWidth = $scope.selectedQuadResolution.values[0];
+    // var maxStreamHeight = $scope.selectedQuadResolution.values[1];
+
+
 
     $scope.updateInProgress = false;
     $scope.saveQuadrator = function (quadratorForm) {
@@ -221,6 +246,10 @@ module.controller('quadratorsEditController', function ($scope, QuadratorsServic
             $scope.currentQuadrator['output_width'] = calculatedWidthSize;
             $scope.currentQuadrator['output_height'] = maxStreamHeight;
         }
+        console.log('save');
+        console.log(maxStreamWidth,maxStreamHeight);
+        console.log('output value');
+        console.log($scope.currentQuadrator['output_width'],$scope.currentQuadrator['output_height']);
 
         $scope.currentQuadrator.cameras = [];
         $scope.quadratorParams.forEach(function (params, index) {
