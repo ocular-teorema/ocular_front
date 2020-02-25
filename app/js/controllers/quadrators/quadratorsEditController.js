@@ -205,8 +205,8 @@ module.controller('quadratorsEditController', function ($scope, QuadratorsServic
 
     $scope.quadResolutions = [
         {
-            size: '1080x720',
-            values: [1080, 720]
+            size: '1280x720',
+            values: [1280, 720]
         }, {
             size: '1920x1080',
             values: [1920,1080]
