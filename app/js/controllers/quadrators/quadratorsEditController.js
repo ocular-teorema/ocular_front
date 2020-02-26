@@ -228,16 +228,18 @@ module.controller('quadratorsEditController', function ($scope, QuadratorsServic
     // var maxStreamWidth = $scope.selectedQuadResolution.values[0];
     // var maxStreamHeight = $scope.selectedQuadResolution.values[1];
 
-
-
     $scope.updateInProgress = false;
     $scope.saveQuadrator = function (quadratorForm) {
         if (!quadratorForm.$valid) return;
         $scope.currentQuadrator['num_cam_x'] = $scope.qudratorSize.num_cam_x.length;
         $scope.currentQuadrator['num_cam_y'] = $scope.qudratorSize.num_cam_y.length;
 
-        var calculatedHeightSize = Math.ceil((maxStreamWidth / $scope.currentQuadrator['num_cam_x']) / $scope.selectedSize.values[0] * $scope.selectedSize.values[1] * $scope.currentQuadrator['num_cam_y']);
+        console.log('Get height before round = ', calculatedHeightSize);
+        var calculatedHeightSize = Math.round(Math.ceil((maxStreamWidth / $scope.currentQuadrator['num_cam_x']) / $scope.selectedSize.values[0] * $scope.selectedSize.values[1] * $scope.currentQuadrator['num_cam_y'])/2)*2;
         var calculatedWidthSize = Math.ceil((maxStreamHeight / $scope.currentQuadrator['num_cam_y']) / $scope.selectedSize.values[1] * $scope.selectedSize.values[0] * $scope.currentQuadrator['num_cam_x']);
+
+        calculatedHeightSize = Math.round(calculatedHeightSize/2)*2;
+        console.log('Get height after Round = ', calculatedHeightSize);
 
         if (calculatedHeightSize < maxStreamHeight) {
             $scope.currentQuadrator['output_width'] = maxStreamWidth;
