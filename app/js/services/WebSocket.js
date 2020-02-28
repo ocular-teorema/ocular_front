@@ -2,7 +2,7 @@ var module = angular.module('Services');
 module.service('WebSocketService', function($location) {
 
     // var port = '';
-    // var host = '80.254.48.93';
+    // var host = '78.46.97.176';
 
     var host = $location.$$host;
     var port = $location.$$port ? ':' + $location.$$port : '';
@@ -16,6 +16,7 @@ module.service('WebSocketService', function($location) {
     var openCallback;
     var latestSubscription;
     var onConnectCb;
+    var onDisconnectCb;
 
     var subscribe = function(ids, callback) {
         latestSubscription = {
@@ -27,6 +28,7 @@ module.service('WebSocketService', function($location) {
         };
 
         openCallback = false;
+
         if (openedClient) {
             client.send(JSON.stringify({"subscribe": ids}));
         } else {
@@ -38,9 +40,16 @@ module.service('WebSocketService', function($location) {
 
     var reconnectWS = function() {
         client = new WebSocket('ws://' + host + port + path);
-        client.onclose = reconnectWS;
+        // client.onclose = reconnectWS;
+        client.onclose = function() {
+            console.log('close connection socket');
+            openedClient = false;
+            onDisconnectCb ? onDisconnectCb() : true;
+            reconnectWS();
+        };
         client.onopen = function() {
-            openedClient = true;
+            console.log('start connection socket');
+            openedClient = true; 
             openCallback ? openCallback() : false;
             onConnectCb ? onConnectCb() : false;
         };
@@ -52,10 +61,21 @@ module.service('WebSocketService', function($location) {
 
     var addOnConnectHandler = function(cb) {
         onConnectCb = cb;
+        if (openedClient) {
+            onConnectCb();
+        }
+    }
+
+    var addOnDisconnectHandler = function(cb) {
+        onDisconnectCb = cb;
+        if (!openedClient) {
+            onDisconnectCb();
+        }
     }
 
     return {
         addOnConnectHandler: addOnConnectHandler,
+        addOnDisconnectHandler: addOnDisconnectHandler,
         subscribe: subscribe,
         unsubscribe: function() {
             client.onmessage = undefined;
@@ -65,5 +85,4 @@ module.service('WebSocketService', function($location) {
             client.send(JSON.stringify(data));
         }
     }
-
 });

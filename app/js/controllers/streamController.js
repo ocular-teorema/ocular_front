@@ -158,31 +158,38 @@ module.controller('streamController', function (
     };
 
     var currentPinger;
-    var ststusMsgConnect;
-    var sendMsgPing = function () { 
-
+    var statusMsgConnect;
+    
+    var sendMsgPing = function () {
         console.log('send guad_id:', $scope.vm.camerasQuadrator.id);
-
         WebSocketService.sendReaction({
             quad_id: $scope.vm.camerasQuadrator.id,
         });
-
-        currentPinger = $timeout(sendMsgPing, 30000);
-    }
-
-    var sendViewSelected = function() {        
-        if (currentPinger) {
-            $timeout.cancel(currentPinger);
-        }
-        sendMsgPing();
     }
 
     WebSocketService.addOnConnectHandler(function() {
-        sendViewSelected();
-        ststusMsgConnect = true;
+        console.log('stream Connect');
+        if (currentPinger) {
+            $interval.cancel(currentPinger);
+        }
+        statusMsgConnect = true;
+        sendMsgPing();
+        currentPinger = $interval(sendMsgPing, 30000);
+    });
+
+    WebSocketService.addOnDisconnectHandler(function() {
+        console.log('stream Disconnect');
+        if (currentPinger) {
+            $interval.cancel(currentPinger);
+        }
+        statusMsgConnect = false;
     });
 
     $scope.$watch('vm.camerasQuadrator', function (newQu, oldQu) {
+
+        console.log('vm.camerasQuadrator change');
+
+
         checkQuadratorSize();
         $scope.closeSelectedCamera();
         $scope.showVideoContainer = false;
@@ -192,7 +199,10 @@ module.controller('streamController', function (
 
         resetEventsList(oldQu);
 
-        (ststusMsgConnect) ? sendViewSelected() : null;
+        // sendViewSelected();
+
+        (statusMsgConnect) ? sendMsgPing() : null;
+        
 
         if ($scope.vm.camerasQuadrator) {
             WebSocketService.subscribe($scope.vm.camerasQuadrator.cameras.filter(function (value, index, self) {
@@ -401,6 +411,7 @@ module.controller('streamController', function (
 
     $scope.$on('$destroy', function () {
         $interval.cancel(dateTimeInterval);
+        $interval.cancel(currentPinger);
     });
 
     $scope.openActiveCamera = function ($event) {
